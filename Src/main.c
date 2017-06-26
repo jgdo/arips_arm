@@ -50,8 +50,6 @@
 #include "stm32f1xx_hal.h"
 #include "usb_device.h"
 
-#include <stdio.h>
-
 /* USER CODE BEGIN Includes */
 extern void initialise_monitor_handles(void);
 
@@ -120,14 +118,20 @@ int main(void)
   initialise_monitor_handles();
   
   HAL_TIM_Base_Start(&htim1); 
-  HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_ALL); 
+  HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);  
+    
   HAL_ADC_Start(&hadc1);
   
-  HAL_GPIO_WritePin(EN_A_GPIO_Port, EN_A_Pin, 1);
   /* USER CODE END 2 */
 
-  
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
   return cpp_main();
+  /* USER CODE END WHILE */
+
+  /* USER CODE BEGIN 3 */
+  /* USER CODE END 3 */
+
 }
 
 /** System Clock Configuration
@@ -228,6 +232,8 @@ static void MX_TIM1_Init(void)
   TIM_OC_InitTypeDef sConfigOC;
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig;
 
+  
+	
   htim1.Instance = TIM1;
   htim1.Init.Prescaler = 31;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -238,6 +244,9 @@ static void MX_TIM1_Init(void)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
+
+
+  HAL_TIM_Base_MspInit(&htim1);
 
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
   if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK)
@@ -265,6 +274,11 @@ static void MX_TIM1_Init(void)
   sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
   sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
   if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
