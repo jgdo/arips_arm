@@ -11,7 +11,7 @@ uint32_t SysTickTimer::sLastProcessedTick = 0xFFFFFFFFu;
 SysTickTimer* SysTickTimer::sTimerQueue = nullptr;
 
 SysTickTimer::SysTickTimer(uint32_t period) :
-		mPeriod(period) {
+		mPeriod(period > 0 ? period : 1) {
 	insertSelfIntoQueue();
 }
 

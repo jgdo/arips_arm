@@ -8,6 +8,8 @@
 #include <utl/Timer.h>
 #include <control/L298.h>
 
+#include "ControllerHardware.h"
+
 extern "C" {
 int cpp_main(void);
 
@@ -20,8 +22,9 @@ L298Motor motor("motor_1", IN_1_GPIO_Port, IN_1_Pin, IN_2_GPIO_Port, IN_2_Pin, T
 
 ros::NodeHandle nh;
 
-arips_arm_msgs::control_raw_array msg;
+arips_arm_msgs::control_raw_stamped msg;
 ros::Publisher chatter("control_raw", &msg);
+
 
 
 template<class fdf>
@@ -35,30 +38,21 @@ int cpp_main() {
 	nh.initNode();
 	nh.advertise(chatter);
 	
-	int dataCounter = 0;
-	
-	
-	auto handle = SysTickTimer::createTimer(100, [&]() {
+	auto handle = SysTickTimer::createTimer(10, [&]() {
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 		
-		if(HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
-			int value = HAL_ADC_GetValue(&hadc1);
-			
-			if(value > 2100)
-				motor.set(-0.3);
-			else if(value < 1900)
-				motor.set(0.3);
-			else
-				motor.set(0);
-			
-			msg.data[dataCounter].stamp = nh.now();
-			msg.data[dataCounter].adc[0] = value;
-			dataCounter++;
-			if(dataCounter == sizeof(msg.data)/sizeof(*msg.data)) {
-				dataCounter = 0;
-				chatter.publish(&msg);
-			}
-		}
+		auto adc = chw::adc::getAll();
+		/* if(value > 2100)
+			motor.set(-0.3);
+		else if(value < 1900)
+			motor.set(0.3);
+		else
+			motor.set(0); */
+		
+		msg.stamp = nh.now();
+		msg.adc[0] = adc[0];
+		msg.adc[1] = adc[1];
+		chatter.publish(&msg); 
 	});
 	
 	while (1) {

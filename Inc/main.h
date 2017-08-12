@@ -51,7 +51,7 @@
   /* Includes ------------------------------------------------------------------*/
 
 /* USER CODE BEGIN Includes */
-
+#include <stdint.h>
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/
@@ -70,6 +70,13 @@
 #define EN_A_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
+
+#define ADC_DMA_BUF_NUM_SAMPLES 128
+#define ADC_CHANNELS_IN_USE 2
+#define ADC_DMA_BUF_SIZE (ADC_CHANNELS_IN_USE * ADC_DMA_BUF_NUM_SAMPLES)
+extern uint32_t gAdcDMABuffer[ADC_DMA_BUF_SIZE];
+
+extern volatile uint32_t gAdcCurrentValue[ADC_CHANNELS_IN_USE];
 
 /* USER CODE END Private defines */
 
