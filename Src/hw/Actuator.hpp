@@ -5,8 +5,11 @@
  *      Author: jgdo
  */
 
-#ifndef CONTROL_ACTUATOR_HPP_
-#define CONTROL_ACTUATOR_HPP_
+#ifndef HW_ACTUATOR_HPP_
+#define HW_ACTUATOR_HPP_
+
+namespace hw {
+
 
 struct Actuator {
 	virtual ~Actuator() {}
@@ -15,5 +18,6 @@ struct Actuator {
 	virtual const char* name() const = 0;
 };
 
+}
 
-#endif /* CONTROL_ACTUATOR_HPP_ */
+#endif /* HW_ACTUATOR_HPP_ */

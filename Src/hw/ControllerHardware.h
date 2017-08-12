@@ -12,11 +12,12 @@
 #include <array>
 
 #include "main.h"
+#include "Actuator.hpp"
 
 #include "stm32f1xx_hal.h"
 
 // Controller Hardware
-namespace chw {
+namespace hw {
 
 namespace adc {
 
@@ -44,8 +45,10 @@ inline int get(size_t channel) {
 	return adc;
 }
 
-}
+} // namespace adc
 
-}
+extern std::array<Actuator*, 1> allMotors;
+
+} // namespace hw 
 
 #endif /* CONTROLLERHARDWARE_H_ */

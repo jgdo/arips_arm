@@ -5,13 +5,13 @@
  *      Author: jgdo
  */
 
-#ifndef CONTROL_L298_H_
-#define CONTROL_L298_H_
+#ifndef HW_L298_H_
+#define HW_L298_H_
 
+#include <hw/Actuator.hpp>
 #include <stm32f1xx_hal.h>
 
-#include "Actuator.hpp"
-
+namespace hw {
 
 class L298Motor: public Actuator {
 public:
@@ -54,6 +54,9 @@ private:
 	
 };
 
-extern L298Motor motor; 
+extern L298Motor l298motor0; 
 
-#endif /* CONTROL_L298_H_ */
+} // namespace hw 
+
+
+#endif /* HW_L298_H_ */

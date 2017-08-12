@@ -3,12 +3,12 @@
 #include <stdio.h>
 
 #include <arips_arm_msgs/control_raw_array.h>
+#include <hw/L298.h>
 
 #include <ros.h>
 #include <utl/Timer.h>
-#include <control/L298.h>
-
-#include "ControllerHardware.h"
+#include "hw/ControllerHardware.h"
+#include "control/PIDController.h"
 
 extern "C" {
 int cpp_main(void);
@@ -18,42 +18,30 @@ extern ADC_HandleTypeDef hadc1;
 extern TIM_HandleTypeDef htim1;
 }
 
-L298Motor motor("motor_1", IN_1_GPIO_Port, IN_1_Pin, IN_2_GPIO_Port, IN_2_Pin, TIM1, TIM1->CCR1);
-
 ros::NodeHandle nh;
 
 arips_arm_msgs::control_raw_stamped msg;
 ros::Publisher chatter("control_raw", &msg);
 
 
-
-template<class fdf>
-struct C {
-	void set() {
-		// HAL_GPIO_WritePin(T, IN_2_Pin, GPIO_PIN_RESET);
-	}
-};
-
 int cpp_main() {
 	nh.initNode();
 	nh.advertise(chatter);
 	
+	ctrl::PIDController pid;
+	
 	auto handle = SysTickTimer::createTimer(10, [&]() {
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 		
-		auto adc = chw::adc::getAll();
-		/* if(value > 2100)
-			motor.set(-0.3);
-		else if(value < 1900)
-			motor.set(0.3);
-		else
-			motor.set(0); */
+		auto adc = hw::adc::getAll();
+		hw::l298motor0.set(pid.control(adc[1] / 4096.0f, adc[0] / 4096.0f));
 		
 		msg.stamp = nh.now();
 		msg.adc[0] = adc[0];
 		msg.adc[1] = adc[1];
 		chatter.publish(&msg); 
 	});
+	
 	
 	while (1) {
 		SysTickTimer::handleTimers();
