@@ -38,11 +38,55 @@
 #include "rosserial_msgs/TopicInfo.h"
 
 namespace ros {
+#if 0
+template<class T, class C>
+	template<class T>
+  class Callback {
+  public:		
+		inline Callback(void* obj, void (*function)(void*, T)):
+	  			obj(obj), function(function) {}
+	
+  	inline void call(T t) {
+  		if(function) {
+  			function(obj, t);
+  		}
+  	}
+  	
+  	template<class C, void (C::*M)(T)>
+  	static void methodCaller_(void* obj, T t) {
+  		(((T*)obj)->*M)(t);
+  	}
+  private:  	
+  	void *obj;
+  	void (*function)(void*, T);
+  };
+  
+	template<class T, class C, void (C::*M)(T)>
+		static void callMethod_(void* obj, T t) {
+		(((C*)obj)->*M)(t);
+	}
+	
+	template<class T, void (*F)(T)>
+		static void callFunction_(void*, T t) {
+		F(t);
+	}
+	
+	template<class T, class C, void (C::*M)(T)>
+	Callback<T> bind(C* obj) {
+		return Callback<T>(obj, callMethod_<T, C, M>); 
+	}
+	
+	template<class T, void (*F)(T)>
+	Callback<T> bind() {
+			return Callback<T>(nullptr, callFunction_<T, F>); 
+	}	
+#endif
 
   /* Base class for objects subscribers. */
   class Subscriber_
   {
     public:
+      virtual ~Subscriber_() {}
       virtual void callback(unsigned char *data)=0;
       virtual int getEndpointType()=0;
 
