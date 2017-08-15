@@ -10,7 +10,7 @@
 
 #include "ParameterStore.h"
 
-#include <arips_arm_msgs/parameter.h>
+#include <arips_arm_msgs/SetParameter.h>
 #include <ros.h>
 
 namespace utl {
@@ -21,9 +21,12 @@ public:
 	
 protected:
 	// ros::Publisher pub;
-	ros::Subscriber<arips_arm_msgs::parameter, ROSParameterStoreHandler> sub;
+	// ros::Subscriber<arips_arm_msgs::parameter, ROSParameterStoreHandler> sub;
 	
-	void parameterCallback(const arips_arm_msgs::parameter& p);
+	ros::ServiceServer<arips_arm_msgs::SetParameterRequest,
+		arips_arm_msgs::SetParameterResponse, ROSParameterStoreHandler> paramService;
+
+	void parameterCallback(const arips_arm_msgs::SetParameterRequest& req, arips_arm_msgs::SetParameterResponse& res);
 };
 
 } /* namespace utl */

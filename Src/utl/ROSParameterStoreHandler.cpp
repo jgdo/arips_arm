@@ -12,12 +12,12 @@ namespace utl {
 } /* namespace utl */
 
 utl::ROSParameterStoreHandler::ROSParameterStoreHandler() :
-		sub("parameter", &ROSParameterStoreHandler::parameterCallback, this) {
-	// ros::nh.subscribe(sub);
+		paramService("set_parameter", &ROSParameterStoreHandler::parameterCallback, this) {
+	ros::nh.advertiseService(paramService);
 }
 
-void utl::ROSParameterStoreHandler::parameterCallback(const arips_arm_msgs::parameter& p) {
-	//ParameterStore::setFromString((ParameterStoreEntryID)p.id, p.value);
+void utl::ROSParameterStoreHandler::parameterCallback(const arips_arm_msgs::SetParameterRequest& req,
+		arips_arm_msgs::SetParameterResponse& res) {
 	
-	// ros::nh.loginfo("parameterCallback()");
+	res.result = ParameterStore::setFromString((ParameterStoreEntryID)req.id, req.value);
 }

@@ -39,7 +39,7 @@ namespace arips_arm_msgs
     }
 
     const char * getType(){ return "arips_arm_msgs/control_raw_array"; };
-    const char * getMD5(){ return "0a00546ab298c35dbc7efe7fbb855fe7"; };
+    const char * getMD5(){ return "e0fe83f1fb7c84ab0afc0cc55ff77eab"; };
 
   };
 

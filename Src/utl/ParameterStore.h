@@ -23,36 +23,39 @@ public:
 	
 	template<class T>
 	T get() const;
-	
+
 	template<class T, class V>
 	T set(V&& v) const;
-	
-	virtual void setFromString(const char* str) = 0;
+
+	virtual int setFromString(const char* str) = 0;
 };
 
 template<class T>
-	class ParameterEntryImpl: public ParameterEntry {
-	public:
-		T value;
+class ParameterEntryImpl: public ParameterEntry {
+public:
+	T value;
 
-		ParameterEntryImpl(T v = T()): value(v) {}
-		
-		virtual ~ParameterEntryImpl() {
-		}
-		
-		T getValue() const {
-			return value;
-		}
-		
-		template<class V>
-		void setValue(V&& v) {
-			value = v;
-		}
-		
-		virtual void setFromString(const char* str) override {
-			value = std::atof(str); // todo
-		}
-	};
+	ParameterEntryImpl(T v = T()) :
+			value(v) {
+	}
+	
+	virtual ~ParameterEntryImpl() {
+	}
+	
+	T getValue() const {
+		return value;
+	}
+	
+	template<class V>
+	void setValue(V&& v) {
+		value = v;
+	}
+	
+	virtual int setFromString(const char* str) override {
+		value = std::atof(str); // todo
+		return 0;
+	}
+};
 
 template<class T>
 T ParameterEntry::get() const {
@@ -71,10 +74,7 @@ T ParameterEntry::set(V&& v) const {
 }
 
 enum ParameterStoreEntryID {
-	PS_ID_PID_P,
-	PS_ID_PID_I,
-	PS_ID_PID_D, 
-	PS_ID_END
+	PS_ID_PID_P, PS_ID_PID_I, PS_ID_PID_D, PS_ID_SETPOINT, PS_ID_END
 };
 
 class ParameterStore {
@@ -98,13 +98,16 @@ public:
 		return storeEntries().at(id)->set<T, V>(value);
 	}
 	
-	static inline void setFromString(ParameterStoreEntryID id, const char* str) {
-		storeEntries().at(id)->setFromString(str);
+	static inline int setFromString(ParameterStoreEntryID id, const char* str) {
+		if (id >= storeEntries().size())
+			return 1;
+		return storeEntries().at(id)->setFromString(str);
+		
 	}
 	
 private:
 	static std::array<ParameterEntry*, PS_ID_END>& storeEntries();
-
+	
 };
 
 } /* namespace utl */

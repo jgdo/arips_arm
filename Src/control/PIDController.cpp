@@ -5,6 +5,8 @@
  *      Author: jgdo
  */
 
+#include <cmath>
+
 #include <control/PIDController.h>
 
 #include <utl/ParameterStore.h>
@@ -17,8 +19,15 @@ float PIDController::control(float input, float setpoint) {
 	D = utl::ParameterStore::get<float>(utl::PS_ID_PID_D);
 	
 	float err = setpoint-input;
+	
 	float d = last - input;
 	isum += err *I;
+
+	if(isum > 0.5)
+		isum = .0f;
+	else if(isum < -0.5)
+		isum = -0.5;
+
 	last = input;
 	
 	float out = err*P + isum + d * D;

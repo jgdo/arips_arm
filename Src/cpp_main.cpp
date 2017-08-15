@@ -35,14 +35,23 @@ int cpp_main() {
 	
 	auto handle = SysTickTimer::createTimer(10, [&]() {
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-		
+
 		auto adc = hw::adc::getAll();
-		hw::l298motor0.set(pid.control(adc[1] / 4096.0f, adc[0] / 4096.0f));
+
+		float setpoint = utl::ParameterStore::get<float>(utl::PS_ID_SETPOINT);
+		if(setpoint == 0.0f)
+			setpoint = adc[0] / 4096.0f;
+		
+		float out = pid.control(adc[1] / 4096.0f, setpoint);
+		hw::l298motor0.set(out);
 		
 		msg.stamp = nh.now();
-		msg.adc[0] = adc[0];
-		msg.adc[1] = adc[1];
-		chatter.publish(&msg); 
+		msg.adc_raw[0] = adc[0];
+		msg.adc_raw[1] = adc[1];
+		msg.adc[0] = adc[0] / 4096.0f;
+		msg.adc[1] = adc[1] / 4096.0f;
+		msg.out[0] = out;
+		chatter.publish(&msg);
 	});
 	
 	while (1) {

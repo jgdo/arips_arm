@@ -25,7 +25,7 @@ private:
 	float last = 0.5;
 	float isum = 0;
 		
-	float P = 3, I = 0.005, D=15;
+	float P = 5, I = 0.3, D=50;
 };
 
 } /* namespace ctrl */

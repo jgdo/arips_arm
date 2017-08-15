@@ -1,6 +1,5 @@
-#ifndef _ROS_arips_arm_msgs_parameter_h
-#define _ROS_arips_arm_msgs_parameter_h
-
+#ifndef _ROS_SERVICE_SetParameter_h
+#define _ROS_SERVICE_SetParameter_h
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
@@ -9,7 +8,9 @@
 namespace arips_arm_msgs
 {
 
-  class parameter : public ros::Msg
+static const char SETPARAMETER[] = "arips_arm_msgs/SetParameter";
+
+  class SetParameterRequest : public ros::Msg
   {
     public:
       typedef uint32_t _id_type;
@@ -17,7 +18,7 @@ namespace arips_arm_msgs
       typedef const char* _value_type;
       _value_type value;
 
-    parameter():
+    SetParameterRequest():
       id(0),
       value("")
     {
@@ -59,9 +60,53 @@ namespace arips_arm_msgs
      return offset;
     }
 
-    const char * getType(){ return "arips_arm_msgs/parameter"; };
+    const char * getType(){ return SETPARAMETER; };
     const char * getMD5(){ return "5db66e017a38027f2e35368c71ea670c"; };
 
+  };
+
+  class SetParameterResponse : public ros::Msg
+  {
+    public:
+      typedef uint32_t _result_type;
+      _result_type result;
+
+    SetParameterResponse():
+      result(0)
+    {
+    }
+
+    virtual int serialize(unsigned char *outbuffer) const
+    {
+      int offset = 0;
+      *(outbuffer + offset + 0) = (this->result >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->result >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->result >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->result >> (8 * 3)) & 0xFF;
+      offset += sizeof(this->result);
+      return offset;
+    }
+
+    virtual int deserialize(unsigned char *inbuffer)
+    {
+      int offset = 0;
+      this->result =  ((uint32_t) (*(inbuffer + offset)));
+      this->result |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
+      this->result |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
+      this->result |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
+      offset += sizeof(this->result);
+     return offset;
+    }
+
+    const char * getType(){ return SETPARAMETER; };
+    const char * getMD5(){ return "13d5d28ceaaadbc975dd072a2e10b88a"; };
+
+  };
+
+  class SetParameter {
+    public:
+    typedef SetParameterRequest Request;
+    typedef SetParameterResponse Response;
   };
 
 }
