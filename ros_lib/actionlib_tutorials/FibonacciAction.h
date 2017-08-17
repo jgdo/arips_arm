@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "actionlib_tutorials/FibonacciActionGoal.h"
 #include "actionlib_tutorials/FibonacciActionResult.h"

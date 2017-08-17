@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 #include "geometry_msgs/Pose.h"
@@ -38,14 +40,8 @@ namespace visualization_msgs
       _lifetime_type lifetime;
       typedef bool _frame_locked_type;
       _frame_locked_type frame_locked;
-      uint32_t points_length;
-      typedef geometry_msgs::Point _points_type;
-      _points_type st_points;
-      _points_type * points;
-      uint32_t colors_length;
-      typedef std_msgs::ColorRGBA _colors_type;
-      _colors_type st_colors;
-      _colors_type * colors;
+      std::vector<geometry_msgs::Point> points;
+      std::vector<std_msgs::ColorRGBA> colors;
       typedef const char* _text_type;
       _text_type text;
       typedef const char* _mesh_resource_type;
@@ -80,8 +76,8 @@ namespace visualization_msgs
       color(),
       lifetime(),
       frame_locked(0),
-      points_length(0), points(NULL),
-      colors_length(0), colors(NULL),
+      points(),
+      colors(),
       text(""),
       mesh_resource(""),
       mesh_use_embedded_materials(0)
@@ -147,20 +143,20 @@ namespace visualization_msgs
       u_frame_locked.real = this->frame_locked;
       *(outbuffer + offset + 0) = (u_frame_locked.base >> (8 * 0)) & 0xFF;
       offset += sizeof(this->frame_locked);
-      *(outbuffer + offset + 0) = (this->points_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->points_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->points_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->points_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->points_length);
-      for( uint32_t i = 0; i < points_length; i++){
+      *(outbuffer + offset + 0) = (this->points.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->points.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->points.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->points.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < points.size(); i++){
       offset += this->points[i].serialize(outbuffer + offset);
       }
-      *(outbuffer + offset + 0) = (this->colors_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->colors_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->colors_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->colors_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->colors_length);
-      for( uint32_t i = 0; i < colors_length; i++){
+      *(outbuffer + offset + 0) = (this->colors.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->colors.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->colors.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->colors.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < colors.size(); i++){
       offset += this->colors[i].serialize(outbuffer + offset);
       }
       uint32_t length_text = strlen(this->text);
@@ -254,25 +250,19 @@ namespace visualization_msgs
       points_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       points_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       points_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->points_length);
-      if(points_lengthT > points_length)
-        this->points = (geometry_msgs::Point*)realloc(this->points, points_lengthT * sizeof(geometry_msgs::Point));
-      points_length = points_lengthT;
-      for( uint32_t i = 0; i < points_length; i++){
-      offset += this->st_points.deserialize(inbuffer + offset);
-        memcpy( &(this->points[i]), &(this->st_points), sizeof(geometry_msgs::Point));
+      offset += 4;
+      points.resize(points_lengthT);
+      for( uint32_t i = 0; i < points.size(); i++){
+      offset += this->points[i].deserialize(inbuffer + offset);
       }
       uint32_t colors_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       colors_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       colors_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       colors_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->colors_length);
-      if(colors_lengthT > colors_length)
-        this->colors = (std_msgs::ColorRGBA*)realloc(this->colors, colors_lengthT * sizeof(std_msgs::ColorRGBA));
-      colors_length = colors_lengthT;
-      for( uint32_t i = 0; i < colors_length; i++){
-      offset += this->st_colors.deserialize(inbuffer + offset);
-        memcpy( &(this->colors[i]), &(this->st_colors), sizeof(std_msgs::ColorRGBA));
+      offset += 4;
+      colors.resize(colors_lengthT);
+      for( uint32_t i = 0; i < colors.size(); i++){
+      offset += this->colors[i].deserialize(inbuffer + offset);
       }
       uint32_t length_text;
       arrToVar(length_text, (inbuffer + offset));

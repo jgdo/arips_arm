@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 
 namespace shape_msgs
@@ -12,7 +14,7 @@ namespace shape_msgs
   class Plane : public ros::Msg
   {
     public:
-      float coef[4];
+      std::array<float, 4> coef;
 
     Plane():
       coef()
@@ -22,7 +24,7 @@ namespace shape_msgs
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      for( uint32_t i = 0; i < 4; i++){
+      for( uint32_t i = 0; i < coef.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->coef[i]);
       }
       return offset;
@@ -31,7 +33,7 @@ namespace shape_msgs
     virtual int deserialize(unsigned char *inbuffer)
     {
       int offset = 0;
-      for( uint32_t i = 0; i < 4; i++){
+      for( uint32_t i = 0; i < coef.size(); i++){
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->coef[i]));
       }
      return offset;

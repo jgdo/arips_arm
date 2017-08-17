@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 
 namespace shape_msgs
@@ -14,10 +16,7 @@ namespace shape_msgs
     public:
       typedef uint8_t _type_type;
       _type_type type;
-      uint32_t dimensions_length;
-      typedef float _dimensions_type;
-      _dimensions_type st_dimensions;
-      _dimensions_type * dimensions;
+      std::vector<float> dimensions;
       enum { BOX = 1 };
       enum { SPHERE = 2 };
       enum { CYLINDER = 3 };
@@ -33,7 +32,7 @@ namespace shape_msgs
 
     SolidPrimitive():
       type(0),
-      dimensions_length(0), dimensions(NULL)
+      dimensions()
     {
     }
 
@@ -42,12 +41,12 @@ namespace shape_msgs
       int offset = 0;
       *(outbuffer + offset + 0) = (this->type >> (8 * 0)) & 0xFF;
       offset += sizeof(this->type);
-      *(outbuffer + offset + 0) = (this->dimensions_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->dimensions_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->dimensions_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->dimensions_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->dimensions_length);
-      for( uint32_t i = 0; i < dimensions_length; i++){
+      *(outbuffer + offset + 0) = (this->dimensions.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->dimensions.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->dimensions.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->dimensions.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < dimensions.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->dimensions[i]);
       }
       return offset;
@@ -62,13 +61,10 @@ namespace shape_msgs
       dimensions_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       dimensions_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       dimensions_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->dimensions_length);
-      if(dimensions_lengthT > dimensions_length)
-        this->dimensions = (float*)realloc(this->dimensions, dimensions_lengthT * sizeof(float));
-      dimensions_length = dimensions_lengthT;
-      for( uint32_t i = 0; i < dimensions_length; i++){
-      offset += deserializeAvrFloat64(inbuffer + offset, &(this->st_dimensions));
-        memcpy( &(this->dimensions[i]), &(this->st_dimensions), sizeof(float));
+      offset += 4;
+      dimensions.resize(dimensions_lengthT);
+      for( uint32_t i = 0; i < dimensions.size(); i++){
+      offset += deserializeAvrFloat64(inbuffer + offset, &(this->dimensions[i]));
       }
      return offset;
     }

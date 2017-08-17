@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 #include "sensor_msgs/PointCloud2.h"
@@ -19,15 +21,12 @@ namespace pcl_msgs
       _header_type header;
       typedef sensor_msgs::PointCloud2 _cloud_type;
       _cloud_type cloud;
-      uint32_t polygons_length;
-      typedef pcl_msgs::Vertices _polygons_type;
-      _polygons_type st_polygons;
-      _polygons_type * polygons;
+      std::vector<pcl_msgs::Vertices> polygons;
 
     PolygonMesh():
       header(),
       cloud(),
-      polygons_length(0), polygons(NULL)
+      polygons()
     {
     }
 
@@ -36,12 +35,12 @@ namespace pcl_msgs
       int offset = 0;
       offset += this->header.serialize(outbuffer + offset);
       offset += this->cloud.serialize(outbuffer + offset);
-      *(outbuffer + offset + 0) = (this->polygons_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->polygons_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->polygons_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->polygons_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->polygons_length);
-      for( uint32_t i = 0; i < polygons_length; i++){
+      *(outbuffer + offset + 0) = (this->polygons.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->polygons.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->polygons.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->polygons.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < polygons.size(); i++){
       offset += this->polygons[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -56,13 +55,10 @@ namespace pcl_msgs
       polygons_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       polygons_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       polygons_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->polygons_length);
-      if(polygons_lengthT > polygons_length)
-        this->polygons = (pcl_msgs::Vertices*)realloc(this->polygons, polygons_lengthT * sizeof(pcl_msgs::Vertices));
-      polygons_length = polygons_lengthT;
-      for( uint32_t i = 0; i < polygons_length; i++){
-      offset += this->st_polygons.deserialize(inbuffer + offset);
-        memcpy( &(this->polygons[i]), &(this->st_polygons), sizeof(pcl_msgs::Vertices));
+      offset += 4;
+      polygons.resize(polygons_lengthT);
+      for( uint32_t i = 0; i < polygons.size(); i++){
+      offset += this->polygons[i].deserialize(inbuffer + offset);
       }
      return offset;
     }

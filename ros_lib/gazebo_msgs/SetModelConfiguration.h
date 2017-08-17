@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 
 namespace gazebo_msgs
@@ -17,20 +19,14 @@ static const char SETMODELCONFIGURATION[] = "gazebo_msgs/SetModelConfiguration";
       _model_name_type model_name;
       typedef const char* _urdf_param_name_type;
       _urdf_param_name_type urdf_param_name;
-      uint32_t joint_names_length;
-      typedef char* _joint_names_type;
-      _joint_names_type st_joint_names;
-      _joint_names_type * joint_names;
-      uint32_t joint_positions_length;
-      typedef float _joint_positions_type;
-      _joint_positions_type st_joint_positions;
-      _joint_positions_type * joint_positions;
+      std::vector<char*> joint_names;
+      std::vector<float> joint_positions;
 
     SetModelConfigurationRequest():
       model_name(""),
       urdf_param_name(""),
-      joint_names_length(0), joint_names(NULL),
-      joint_positions_length(0), joint_positions(NULL)
+      joint_names(),
+      joint_positions()
     {
     }
 
@@ -47,24 +43,24 @@ static const char SETMODELCONFIGURATION[] = "gazebo_msgs/SetModelConfiguration";
       offset += 4;
       memcpy(outbuffer + offset, this->urdf_param_name, length_urdf_param_name);
       offset += length_urdf_param_name;
-      *(outbuffer + offset + 0) = (this->joint_names_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->joint_names_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->joint_names_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->joint_names_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->joint_names_length);
-      for( uint32_t i = 0; i < joint_names_length; i++){
+      *(outbuffer + offset + 0) = (this->joint_names.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->joint_names.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->joint_names.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->joint_names.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < joint_names.size(); i++){
       uint32_t length_joint_namesi = strlen(this->joint_names[i]);
       varToArr(outbuffer + offset, length_joint_namesi);
       offset += 4;
       memcpy(outbuffer + offset, this->joint_names[i], length_joint_namesi);
       offset += length_joint_namesi;
       }
-      *(outbuffer + offset + 0) = (this->joint_positions_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->joint_positions_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->joint_positions_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->joint_positions_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->joint_positions_length);
-      for( uint32_t i = 0; i < joint_positions_length; i++){
+      *(outbuffer + offset + 0) = (this->joint_positions.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->joint_positions.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->joint_positions.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->joint_positions.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < joint_positions.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->joint_positions[i]);
       }
       return offset;
@@ -95,33 +91,27 @@ static const char SETMODELCONFIGURATION[] = "gazebo_msgs/SetModelConfiguration";
       joint_names_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       joint_names_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       joint_names_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->joint_names_length);
-      if(joint_names_lengthT > joint_names_length)
-        this->joint_names = (char**)realloc(this->joint_names, joint_names_lengthT * sizeof(char*));
-      joint_names_length = joint_names_lengthT;
-      for( uint32_t i = 0; i < joint_names_length; i++){
-      uint32_t length_st_joint_names;
-      arrToVar(length_st_joint_names, (inbuffer + offset));
       offset += 4;
-      for(unsigned int k= offset; k< offset+length_st_joint_names; ++k){
+      joint_names.resize(joint_names_lengthT);
+      for( uint32_t i = 0; i < joint_names.size(); i++){
+      uint32_t length_joint_namesi;
+      arrToVar(length_joint_namesi, (inbuffer + offset));
+      offset += 4;
+      for(unsigned int k= offset; k< offset+length_joint_namesi; ++k){
           inbuffer[k-1]=inbuffer[k];
       }
-      inbuffer[offset+length_st_joint_names-1]=0;
-      this->st_joint_names = (char *)(inbuffer + offset-1);
-      offset += length_st_joint_names;
-        memcpy( &(this->joint_names[i]), &(this->st_joint_names), sizeof(char*));
+      inbuffer[offset+length_joint_namesi-1]=0;
+      this->joint_names[i] = (char *)(inbuffer + offset-1);
+      offset += length_joint_namesi;
       }
       uint32_t joint_positions_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       joint_positions_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       joint_positions_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       joint_positions_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->joint_positions_length);
-      if(joint_positions_lengthT > joint_positions_length)
-        this->joint_positions = (float*)realloc(this->joint_positions, joint_positions_lengthT * sizeof(float));
-      joint_positions_length = joint_positions_lengthT;
-      for( uint32_t i = 0; i < joint_positions_length; i++){
-      offset += deserializeAvrFloat64(inbuffer + offset, &(this->st_joint_positions));
-        memcpy( &(this->joint_positions[i]), &(this->st_joint_positions), sizeof(float));
+      offset += 4;
+      joint_positions.resize(joint_positions_lengthT);
+      for( uint32_t i = 0; i < joint_positions.size(); i++){
+      offset += deserializeAvrFloat64(inbuffer + offset, &(this->joint_positions[i]));
       }
      return offset;
     }

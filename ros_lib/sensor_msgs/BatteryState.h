@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 
@@ -35,10 +37,7 @@ namespace sensor_msgs
       _power_supply_technology_type power_supply_technology;
       typedef bool _present_type;
       _present_type present;
-      uint32_t cell_voltage_length;
-      typedef float _cell_voltage_type;
-      _cell_voltage_type st_cell_voltage;
-      _cell_voltage_type * cell_voltage;
+      std::vector<float> cell_voltage;
       typedef const char* _location_type;
       _location_type location;
       typedef const char* _serial_number_type;
@@ -77,7 +76,7 @@ namespace sensor_msgs
       power_supply_health(0),
       power_supply_technology(0),
       present(0),
-      cell_voltage_length(0), cell_voltage(NULL),
+      cell_voltage(),
       location(""),
       serial_number("")
     {
@@ -160,12 +159,12 @@ namespace sensor_msgs
       u_present.real = this->present;
       *(outbuffer + offset + 0) = (u_present.base >> (8 * 0)) & 0xFF;
       offset += sizeof(this->present);
-      *(outbuffer + offset + 0) = (this->cell_voltage_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->cell_voltage_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->cell_voltage_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->cell_voltage_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->cell_voltage_length);
-      for( uint32_t i = 0; i < cell_voltage_length; i++){
+      *(outbuffer + offset + 0) = (this->cell_voltage.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->cell_voltage.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->cell_voltage.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->cell_voltage.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < cell_voltage.size(); i++){
       union {
         float real;
         uint32_t base;
@@ -278,23 +277,20 @@ namespace sensor_msgs
       cell_voltage_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       cell_voltage_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       cell_voltage_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->cell_voltage_length);
-      if(cell_voltage_lengthT > cell_voltage_length)
-        this->cell_voltage = (float*)realloc(this->cell_voltage, cell_voltage_lengthT * sizeof(float));
-      cell_voltage_length = cell_voltage_lengthT;
-      for( uint32_t i = 0; i < cell_voltage_length; i++){
+      offset += 4;
+      cell_voltage.resize(cell_voltage_lengthT);
+      for( uint32_t i = 0; i < cell_voltage.size(); i++){
       union {
         float real;
         uint32_t base;
-      } u_st_cell_voltage;
-      u_st_cell_voltage.base = 0;
-      u_st_cell_voltage.base |= ((uint32_t) (*(inbuffer + offset + 0))) << (8 * 0);
-      u_st_cell_voltage.base |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
-      u_st_cell_voltage.base |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
-      u_st_cell_voltage.base |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
-      this->st_cell_voltage = u_st_cell_voltage.real;
-      offset += sizeof(this->st_cell_voltage);
-        memcpy( &(this->cell_voltage[i]), &(this->st_cell_voltage), sizeof(float));
+      } u_cell_voltagei;
+      u_cell_voltagei.base = 0;
+      u_cell_voltagei.base |= ((uint32_t) (*(inbuffer + offset + 0))) << (8 * 0);
+      u_cell_voltagei.base |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
+      u_cell_voltagei.base |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
+      u_cell_voltagei.base |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
+      this->cell_voltage[i] = u_cell_voltagei.real;
+      offset += sizeof(this->cell_voltage[i]);
       }
       uint32_t length_location;
       arrToVar(length_location, (inbuffer + offset));

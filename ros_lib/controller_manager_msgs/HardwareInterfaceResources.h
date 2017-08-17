@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 
 namespace controller_manager_msgs
@@ -14,14 +16,11 @@ namespace controller_manager_msgs
     public:
       typedef const char* _hardware_interface_type;
       _hardware_interface_type hardware_interface;
-      uint32_t resources_length;
-      typedef char* _resources_type;
-      _resources_type st_resources;
-      _resources_type * resources;
+      std::vector<char*> resources;
 
     HardwareInterfaceResources():
       hardware_interface(""),
-      resources_length(0), resources(NULL)
+      resources()
     {
     }
 
@@ -33,12 +32,12 @@ namespace controller_manager_msgs
       offset += 4;
       memcpy(outbuffer + offset, this->hardware_interface, length_hardware_interface);
       offset += length_hardware_interface;
-      *(outbuffer + offset + 0) = (this->resources_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->resources_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->resources_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->resources_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->resources_length);
-      for( uint32_t i = 0; i < resources_length; i++){
+      *(outbuffer + offset + 0) = (this->resources.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->resources.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->resources.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->resources.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < resources.size(); i++){
       uint32_t length_resourcesi = strlen(this->resources[i]);
       varToArr(outbuffer + offset, length_resourcesi);
       offset += 4;
@@ -64,21 +63,18 @@ namespace controller_manager_msgs
       resources_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       resources_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       resources_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->resources_length);
-      if(resources_lengthT > resources_length)
-        this->resources = (char**)realloc(this->resources, resources_lengthT * sizeof(char*));
-      resources_length = resources_lengthT;
-      for( uint32_t i = 0; i < resources_length; i++){
-      uint32_t length_st_resources;
-      arrToVar(length_st_resources, (inbuffer + offset));
       offset += 4;
-      for(unsigned int k= offset; k< offset+length_st_resources; ++k){
+      resources.resize(resources_lengthT);
+      for( uint32_t i = 0; i < resources.size(); i++){
+      uint32_t length_resourcesi;
+      arrToVar(length_resourcesi, (inbuffer + offset));
+      offset += 4;
+      for(unsigned int k= offset; k< offset+length_resourcesi; ++k){
           inbuffer[k-1]=inbuffer[k];
       }
-      inbuffer[offset+length_st_resources-1]=0;
-      this->st_resources = (char *)(inbuffer + offset-1);
-      offset += length_st_resources;
-        memcpy( &(this->resources[i]), &(this->st_resources), sizeof(char*));
+      inbuffer[offset+length_resourcesi-1]=0;
+      this->resources[i] = (char *)(inbuffer + offset-1);
+      offset += length_resourcesi;
       }
      return offset;
     }

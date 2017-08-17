@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "ros/duration.h"
 #include "geometry_msgs/Wrench.h"

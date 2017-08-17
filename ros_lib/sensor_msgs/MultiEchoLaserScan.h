@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 #include "sensor_msgs/LaserEcho.h"
@@ -30,14 +32,8 @@ namespace sensor_msgs
       _range_min_type range_min;
       typedef float _range_max_type;
       _range_max_type range_max;
-      uint32_t ranges_length;
-      typedef sensor_msgs::LaserEcho _ranges_type;
-      _ranges_type st_ranges;
-      _ranges_type * ranges;
-      uint32_t intensities_length;
-      typedef sensor_msgs::LaserEcho _intensities_type;
-      _intensities_type st_intensities;
-      _intensities_type * intensities;
+      std::vector<sensor_msgs::LaserEcho> ranges;
+      std::vector<sensor_msgs::LaserEcho> intensities;
 
     MultiEchoLaserScan():
       header(),
@@ -48,8 +44,8 @@ namespace sensor_msgs
       scan_time(0),
       range_min(0),
       range_max(0),
-      ranges_length(0), ranges(NULL),
-      intensities_length(0), intensities(NULL)
+      ranges(),
+      intensities()
     {
     }
 
@@ -127,20 +123,20 @@ namespace sensor_msgs
       *(outbuffer + offset + 2) = (u_range_max.base >> (8 * 2)) & 0xFF;
       *(outbuffer + offset + 3) = (u_range_max.base >> (8 * 3)) & 0xFF;
       offset += sizeof(this->range_max);
-      *(outbuffer + offset + 0) = (this->ranges_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->ranges_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->ranges_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->ranges_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->ranges_length);
-      for( uint32_t i = 0; i < ranges_length; i++){
+      *(outbuffer + offset + 0) = (this->ranges.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->ranges.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->ranges.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->ranges.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < ranges.size(); i++){
       offset += this->ranges[i].serialize(outbuffer + offset);
       }
-      *(outbuffer + offset + 0) = (this->intensities_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->intensities_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->intensities_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->intensities_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->intensities_length);
-      for( uint32_t i = 0; i < intensities_length; i++){
+      *(outbuffer + offset + 0) = (this->intensities.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->intensities.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->intensities.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->intensities.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < intensities.size(); i++){
       offset += this->intensities[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -231,25 +227,19 @@ namespace sensor_msgs
       ranges_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       ranges_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       ranges_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->ranges_length);
-      if(ranges_lengthT > ranges_length)
-        this->ranges = (sensor_msgs::LaserEcho*)realloc(this->ranges, ranges_lengthT * sizeof(sensor_msgs::LaserEcho));
-      ranges_length = ranges_lengthT;
-      for( uint32_t i = 0; i < ranges_length; i++){
-      offset += this->st_ranges.deserialize(inbuffer + offset);
-        memcpy( &(this->ranges[i]), &(this->st_ranges), sizeof(sensor_msgs::LaserEcho));
+      offset += 4;
+      ranges.resize(ranges_lengthT);
+      for( uint32_t i = 0; i < ranges.size(); i++){
+      offset += this->ranges[i].deserialize(inbuffer + offset);
       }
       uint32_t intensities_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       intensities_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       intensities_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       intensities_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->intensities_length);
-      if(intensities_lengthT > intensities_length)
-        this->intensities = (sensor_msgs::LaserEcho*)realloc(this->intensities, intensities_lengthT * sizeof(sensor_msgs::LaserEcho));
-      intensities_length = intensities_lengthT;
-      for( uint32_t i = 0; i < intensities_length; i++){
-      offset += this->st_intensities.deserialize(inbuffer + offset);
-        memcpy( &(this->intensities[i]), &(this->st_intensities), sizeof(sensor_msgs::LaserEcho));
+      offset += 4;
+      intensities.resize(intensities_lengthT);
+      for( uint32_t i = 0; i < intensities.size(); i++){
+      offset += this->intensities[i].deserialize(inbuffer + offset);
       }
      return offset;
     }

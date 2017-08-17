@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 
 namespace gazebo_msgs
@@ -40,10 +42,7 @@ static const char GETWORLDPROPERTIES[] = "gazebo_msgs/GetWorldProperties";
     public:
       typedef float _sim_time_type;
       _sim_time_type sim_time;
-      uint32_t model_names_length;
-      typedef char* _model_names_type;
-      _model_names_type st_model_names;
-      _model_names_type * model_names;
+      std::vector<char*> model_names;
       typedef bool _rendering_enabled_type;
       _rendering_enabled_type rendering_enabled;
       typedef bool _success_type;
@@ -53,7 +52,7 @@ static const char GETWORLDPROPERTIES[] = "gazebo_msgs/GetWorldProperties";
 
     GetWorldPropertiesResponse():
       sim_time(0),
-      model_names_length(0), model_names(NULL),
+      model_names(),
       rendering_enabled(0),
       success(0),
       status_message("")
@@ -64,12 +63,12 @@ static const char GETWORLDPROPERTIES[] = "gazebo_msgs/GetWorldProperties";
     {
       int offset = 0;
       offset += serializeAvrFloat64(outbuffer + offset, this->sim_time);
-      *(outbuffer + offset + 0) = (this->model_names_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->model_names_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->model_names_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->model_names_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->model_names_length);
-      for( uint32_t i = 0; i < model_names_length; i++){
+      *(outbuffer + offset + 0) = (this->model_names.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->model_names.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->model_names.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->model_names.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < model_names.size(); i++){
       uint32_t length_model_namesi = strlen(this->model_names[i]);
       varToArr(outbuffer + offset, length_model_namesi);
       offset += 4;
@@ -106,21 +105,18 @@ static const char GETWORLDPROPERTIES[] = "gazebo_msgs/GetWorldProperties";
       model_names_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       model_names_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       model_names_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->model_names_length);
-      if(model_names_lengthT > model_names_length)
-        this->model_names = (char**)realloc(this->model_names, model_names_lengthT * sizeof(char*));
-      model_names_length = model_names_lengthT;
-      for( uint32_t i = 0; i < model_names_length; i++){
-      uint32_t length_st_model_names;
-      arrToVar(length_st_model_names, (inbuffer + offset));
       offset += 4;
-      for(unsigned int k= offset; k< offset+length_st_model_names; ++k){
+      model_names.resize(model_names_lengthT);
+      for( uint32_t i = 0; i < model_names.size(); i++){
+      uint32_t length_model_namesi;
+      arrToVar(length_model_namesi, (inbuffer + offset));
+      offset += 4;
+      for(unsigned int k= offset; k< offset+length_model_namesi; ++k){
           inbuffer[k-1]=inbuffer[k];
       }
-      inbuffer[offset+length_st_model_names-1]=0;
-      this->st_model_names = (char *)(inbuffer + offset-1);
-      offset += length_st_model_names;
-        memcpy( &(this->model_names[i]), &(this->st_model_names), sizeof(char*));
+      inbuffer[offset+length_model_namesi-1]=0;
+      this->model_names[i] = (char *)(inbuffer + offset-1);
+      offset += length_model_namesi;
       }
       union {
         bool real;

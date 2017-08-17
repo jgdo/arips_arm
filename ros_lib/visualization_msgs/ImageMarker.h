@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 #include "geometry_msgs/Point.h"
@@ -38,14 +40,8 @@ namespace visualization_msgs
       _fill_color_type fill_color;
       typedef ros::Duration _lifetime_type;
       _lifetime_type lifetime;
-      uint32_t points_length;
-      typedef geometry_msgs::Point _points_type;
-      _points_type st_points;
-      _points_type * points;
-      uint32_t outline_colors_length;
-      typedef std_msgs::ColorRGBA _outline_colors_type;
-      _outline_colors_type st_outline_colors;
-      _outline_colors_type * outline_colors;
+      std::vector<geometry_msgs::Point> points;
+      std::vector<std_msgs::ColorRGBA> outline_colors;
       enum { CIRCLE = 0 };
       enum { LINE_STRIP = 1 };
       enum { LINE_LIST = 2 };
@@ -66,8 +62,8 @@ namespace visualization_msgs
       filled(0),
       fill_color(),
       lifetime(),
-      points_length(0), points(NULL),
-      outline_colors_length(0), outline_colors(NULL)
+      points(),
+      outline_colors()
     {
     }
 
@@ -135,20 +131,20 @@ namespace visualization_msgs
       *(outbuffer + offset + 2) = (this->lifetime.nsec >> (8 * 2)) & 0xFF;
       *(outbuffer + offset + 3) = (this->lifetime.nsec >> (8 * 3)) & 0xFF;
       offset += sizeof(this->lifetime.nsec);
-      *(outbuffer + offset + 0) = (this->points_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->points_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->points_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->points_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->points_length);
-      for( uint32_t i = 0; i < points_length; i++){
+      *(outbuffer + offset + 0) = (this->points.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->points.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->points.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->points.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < points.size(); i++){
       offset += this->points[i].serialize(outbuffer + offset);
       }
-      *(outbuffer + offset + 0) = (this->outline_colors_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->outline_colors_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->outline_colors_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->outline_colors_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->outline_colors_length);
-      for( uint32_t i = 0; i < outline_colors_length; i++){
+      *(outbuffer + offset + 0) = (this->outline_colors.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->outline_colors.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->outline_colors.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->outline_colors.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < outline_colors.size(); i++){
       offset += this->outline_colors[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -230,25 +226,19 @@ namespace visualization_msgs
       points_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       points_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       points_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->points_length);
-      if(points_lengthT > points_length)
-        this->points = (geometry_msgs::Point*)realloc(this->points, points_lengthT * sizeof(geometry_msgs::Point));
-      points_length = points_lengthT;
-      for( uint32_t i = 0; i < points_length; i++){
-      offset += this->st_points.deserialize(inbuffer + offset);
-        memcpy( &(this->points[i]), &(this->st_points), sizeof(geometry_msgs::Point));
+      offset += 4;
+      points.resize(points_lengthT);
+      for( uint32_t i = 0; i < points.size(); i++){
+      offset += this->points[i].deserialize(inbuffer + offset);
       }
       uint32_t outline_colors_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       outline_colors_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       outline_colors_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       outline_colors_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->outline_colors_length);
-      if(outline_colors_lengthT > outline_colors_length)
-        this->outline_colors = (std_msgs::ColorRGBA*)realloc(this->outline_colors, outline_colors_lengthT * sizeof(std_msgs::ColorRGBA));
-      outline_colors_length = outline_colors_lengthT;
-      for( uint32_t i = 0; i < outline_colors_length; i++){
-      offset += this->st_outline_colors.deserialize(inbuffer + offset);
-        memcpy( &(this->outline_colors[i]), &(this->st_outline_colors), sizeof(std_msgs::ColorRGBA));
+      offset += 4;
+      outline_colors.resize(outline_colors_lengthT);
+      for( uint32_t i = 0; i < outline_colors.size(); i++){
+      offset += this->outline_colors[i].deserialize(inbuffer + offset);
       }
      return offset;
     }

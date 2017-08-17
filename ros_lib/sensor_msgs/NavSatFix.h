@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 #include "sensor_msgs/NavSatStatus.h"
@@ -24,7 +26,7 @@ namespace sensor_msgs
       _longitude_type longitude;
       typedef float _altitude_type;
       _altitude_type altitude;
-      float position_covariance[9];
+      std::array<float, 9> position_covariance;
       typedef uint8_t _position_covariance_type_type;
       _position_covariance_type_type position_covariance_type;
       enum { COVARIANCE_TYPE_UNKNOWN =  0 };
@@ -51,7 +53,7 @@ namespace sensor_msgs
       offset += serializeAvrFloat64(outbuffer + offset, this->latitude);
       offset += serializeAvrFloat64(outbuffer + offset, this->longitude);
       offset += serializeAvrFloat64(outbuffer + offset, this->altitude);
-      for( uint32_t i = 0; i < 9; i++){
+      for( uint32_t i = 0; i < position_covariance.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->position_covariance[i]);
       }
       *(outbuffer + offset + 0) = (this->position_covariance_type >> (8 * 0)) & 0xFF;
@@ -67,7 +69,7 @@ namespace sensor_msgs
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->latitude));
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->longitude));
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->altitude));
-      for( uint32_t i = 0; i < 9; i++){
+      for( uint32_t i = 0; i < position_covariance.size(); i++){
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->position_covariance[i]));
       }
       this->position_covariance_type =  ((uint8_t) (*(inbuffer + offset)));

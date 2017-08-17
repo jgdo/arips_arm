@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 
 namespace shape_msgs
@@ -12,7 +14,7 @@ namespace shape_msgs
   class MeshTriangle : public ros::Msg
   {
     public:
-      uint32_t vertex_indices[3];
+      std::array<uint32_t, 3> vertex_indices;
 
     MeshTriangle():
       vertex_indices()
@@ -22,7 +24,7 @@ namespace shape_msgs
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      for( uint32_t i = 0; i < 3; i++){
+      for( uint32_t i = 0; i < vertex_indices.size(); i++){
       *(outbuffer + offset + 0) = (this->vertex_indices[i] >> (8 * 0)) & 0xFF;
       *(outbuffer + offset + 1) = (this->vertex_indices[i] >> (8 * 1)) & 0xFF;
       *(outbuffer + offset + 2) = (this->vertex_indices[i] >> (8 * 2)) & 0xFF;
@@ -35,7 +37,7 @@ namespace shape_msgs
     virtual int deserialize(unsigned char *inbuffer)
     {
       int offset = 0;
-      for( uint32_t i = 0; i < 3; i++){
+      for( uint32_t i = 0; i < vertex_indices.size(); i++){
       this->vertex_indices[i] =  ((uint32_t) (*(inbuffer + offset)));
       this->vertex_indices[i] |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
       this->vertex_indices[i] |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);

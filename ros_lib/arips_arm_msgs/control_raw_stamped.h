@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "ros/time.h"
 
@@ -15,10 +17,10 @@ namespace arips_arm_msgs
     public:
       typedef ros::Time _stamp_type;
       _stamp_type stamp;
-      uint16_t adc_raw[2];
-      float adc[2];
-      float out[2];
-      uint16_t out_raw[2];
+      std::array<uint16_t, 2> adc_raw;
+      std::array<float, 2> adc;
+      std::array<float, 2> out;
+      std::array<uint16_t, 2> out_raw;
 
     control_raw_stamped():
       stamp(),
@@ -42,12 +44,12 @@ namespace arips_arm_msgs
       *(outbuffer + offset + 2) = (this->stamp.nsec >> (8 * 2)) & 0xFF;
       *(outbuffer + offset + 3) = (this->stamp.nsec >> (8 * 3)) & 0xFF;
       offset += sizeof(this->stamp.nsec);
-      for( uint32_t i = 0; i < 2; i++){
+      for( uint32_t i = 0; i < adc_raw.size(); i++){
       *(outbuffer + offset + 0) = (this->adc_raw[i] >> (8 * 0)) & 0xFF;
       *(outbuffer + offset + 1) = (this->adc_raw[i] >> (8 * 1)) & 0xFF;
       offset += sizeof(this->adc_raw[i]);
       }
-      for( uint32_t i = 0; i < 2; i++){
+      for( uint32_t i = 0; i < adc.size(); i++){
       union {
         float real;
         uint32_t base;
@@ -59,7 +61,7 @@ namespace arips_arm_msgs
       *(outbuffer + offset + 3) = (u_adci.base >> (8 * 3)) & 0xFF;
       offset += sizeof(this->adc[i]);
       }
-      for( uint32_t i = 0; i < 2; i++){
+      for( uint32_t i = 0; i < out.size(); i++){
       union {
         float real;
         uint32_t base;
@@ -71,7 +73,7 @@ namespace arips_arm_msgs
       *(outbuffer + offset + 3) = (u_outi.base >> (8 * 3)) & 0xFF;
       offset += sizeof(this->out[i]);
       }
-      for( uint32_t i = 0; i < 2; i++){
+      for( uint32_t i = 0; i < out_raw.size(); i++){
       *(outbuffer + offset + 0) = (this->out_raw[i] >> (8 * 0)) & 0xFF;
       *(outbuffer + offset + 1) = (this->out_raw[i] >> (8 * 1)) & 0xFF;
       offset += sizeof(this->out_raw[i]);
@@ -92,12 +94,12 @@ namespace arips_arm_msgs
       this->stamp.nsec |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
       this->stamp.nsec |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
       offset += sizeof(this->stamp.nsec);
-      for( uint32_t i = 0; i < 2; i++){
+      for( uint32_t i = 0; i < adc_raw.size(); i++){
       this->adc_raw[i] =  ((uint16_t) (*(inbuffer + offset)));
       this->adc_raw[i] |= ((uint16_t) (*(inbuffer + offset + 1))) << (8 * 1);
       offset += sizeof(this->adc_raw[i]);
       }
-      for( uint32_t i = 0; i < 2; i++){
+      for( uint32_t i = 0; i < adc.size(); i++){
       union {
         float real;
         uint32_t base;
@@ -110,7 +112,7 @@ namespace arips_arm_msgs
       this->adc[i] = u_adci.real;
       offset += sizeof(this->adc[i]);
       }
-      for( uint32_t i = 0; i < 2; i++){
+      for( uint32_t i = 0; i < out.size(); i++){
       union {
         float real;
         uint32_t base;
@@ -123,7 +125,7 @@ namespace arips_arm_msgs
       this->out[i] = u_outi.real;
       offset += sizeof(this->out[i]);
       }
-      for( uint32_t i = 0; i < 2; i++){
+      for( uint32_t i = 0; i < out_raw.size(); i++){
       this->out_raw[i] =  ((uint16_t) (*(inbuffer + offset)));
       this->out_raw[i] |= ((uint16_t) (*(inbuffer + offset + 1))) << (8 * 1);
       offset += sizeof(this->out_raw[i]);

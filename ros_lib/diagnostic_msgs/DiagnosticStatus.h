@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "diagnostic_msgs/KeyValue.h"
 
@@ -21,10 +23,7 @@ namespace diagnostic_msgs
       _message_type message;
       typedef const char* _hardware_id_type;
       _hardware_id_type hardware_id;
-      uint32_t values_length;
-      typedef diagnostic_msgs::KeyValue _values_type;
-      _values_type st_values;
-      _values_type * values;
+      std::vector<diagnostic_msgs::KeyValue> values;
       enum { OK = 0 };
       enum { WARN = 1 };
       enum { ERROR = 2 };
@@ -35,7 +34,7 @@ namespace diagnostic_msgs
       name(""),
       message(""),
       hardware_id(""),
-      values_length(0), values(NULL)
+      values()
     {
     }
 
@@ -64,12 +63,12 @@ namespace diagnostic_msgs
       offset += 4;
       memcpy(outbuffer + offset, this->hardware_id, length_hardware_id);
       offset += length_hardware_id;
-      *(outbuffer + offset + 0) = (this->values_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->values_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->values_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->values_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->values_length);
-      for( uint32_t i = 0; i < values_length; i++){
+      *(outbuffer + offset + 0) = (this->values.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->values.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->values.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->values.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < values.size(); i++){
       offset += this->values[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -117,13 +116,10 @@ namespace diagnostic_msgs
       values_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       values_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       values_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->values_length);
-      if(values_lengthT > values_length)
-        this->values = (diagnostic_msgs::KeyValue*)realloc(this->values, values_lengthT * sizeof(diagnostic_msgs::KeyValue));
-      values_length = values_lengthT;
-      for( uint32_t i = 0; i < values_length; i++){
-      offset += this->st_values.deserialize(inbuffer + offset);
-        memcpy( &(this->values[i]), &(this->st_values), sizeof(diagnostic_msgs::KeyValue));
+      offset += 4;
+      values.resize(values_lengthT);
+      for( uint32_t i = 0; i < values.size(); i++){
+      offset += this->values[i].deserialize(inbuffer + offset);
       }
      return offset;
     }

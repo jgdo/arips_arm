@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "roscpp/Logger.h"
 
@@ -39,25 +41,22 @@ static const char GETLOGGERS[] = "roscpp/GetLoggers";
   class GetLoggersResponse : public ros::Msg
   {
     public:
-      uint32_t loggers_length;
-      typedef roscpp::Logger _loggers_type;
-      _loggers_type st_loggers;
-      _loggers_type * loggers;
+      std::vector<roscpp::Logger> loggers;
 
     GetLoggersResponse():
-      loggers_length(0), loggers(NULL)
+      loggers()
     {
     }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      *(outbuffer + offset + 0) = (this->loggers_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->loggers_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->loggers_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->loggers_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->loggers_length);
-      for( uint32_t i = 0; i < loggers_length; i++){
+      *(outbuffer + offset + 0) = (this->loggers.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->loggers.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->loggers.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->loggers.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < loggers.size(); i++){
       offset += this->loggers[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -70,13 +69,10 @@ static const char GETLOGGERS[] = "roscpp/GetLoggers";
       loggers_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       loggers_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       loggers_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->loggers_length);
-      if(loggers_lengthT > loggers_length)
-        this->loggers = (roscpp::Logger*)realloc(this->loggers, loggers_lengthT * sizeof(roscpp::Logger));
-      loggers_length = loggers_lengthT;
-      for( uint32_t i = 0; i < loggers_length; i++){
-      offset += this->st_loggers.deserialize(inbuffer + offset);
-        memcpy( &(this->loggers[i]), &(this->st_loggers), sizeof(roscpp::Logger));
+      offset += 4;
+      loggers.resize(loggers_lengthT);
+      for( uint32_t i = 0; i < loggers.size(); i++){
+      offset += this->loggers[i].deserialize(inbuffer + offset);
       }
      return offset;
     }

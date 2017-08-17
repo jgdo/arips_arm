@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 #include "geometry_msgs/Pose.h"
@@ -26,14 +28,8 @@ namespace visualization_msgs
       _description_type description;
       typedef float _scale_type;
       _scale_type scale;
-      uint32_t menu_entries_length;
-      typedef visualization_msgs::MenuEntry _menu_entries_type;
-      _menu_entries_type st_menu_entries;
-      _menu_entries_type * menu_entries;
-      uint32_t controls_length;
-      typedef visualization_msgs::InteractiveMarkerControl _controls_type;
-      _controls_type st_controls;
-      _controls_type * controls;
+      std::vector<visualization_msgs::MenuEntry> menu_entries;
+      std::vector<visualization_msgs::InteractiveMarkerControl> controls;
 
     InteractiveMarker():
       header(),
@@ -41,8 +37,8 @@ namespace visualization_msgs
       name(""),
       description(""),
       scale(0),
-      menu_entries_length(0), menu_entries(NULL),
-      controls_length(0), controls(NULL)
+      menu_entries(),
+      controls()
     {
     }
 
@@ -71,20 +67,20 @@ namespace visualization_msgs
       *(outbuffer + offset + 2) = (u_scale.base >> (8 * 2)) & 0xFF;
       *(outbuffer + offset + 3) = (u_scale.base >> (8 * 3)) & 0xFF;
       offset += sizeof(this->scale);
-      *(outbuffer + offset + 0) = (this->menu_entries_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->menu_entries_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->menu_entries_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->menu_entries_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->menu_entries_length);
-      for( uint32_t i = 0; i < menu_entries_length; i++){
+      *(outbuffer + offset + 0) = (this->menu_entries.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->menu_entries.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->menu_entries.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->menu_entries.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < menu_entries.size(); i++){
       offset += this->menu_entries[i].serialize(outbuffer + offset);
       }
-      *(outbuffer + offset + 0) = (this->controls_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->controls_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->controls_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->controls_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->controls_length);
-      for( uint32_t i = 0; i < controls_length; i++){
+      *(outbuffer + offset + 0) = (this->controls.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->controls.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->controls.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->controls.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < controls.size(); i++){
       offset += this->controls[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -128,25 +124,19 @@ namespace visualization_msgs
       menu_entries_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       menu_entries_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       menu_entries_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->menu_entries_length);
-      if(menu_entries_lengthT > menu_entries_length)
-        this->menu_entries = (visualization_msgs::MenuEntry*)realloc(this->menu_entries, menu_entries_lengthT * sizeof(visualization_msgs::MenuEntry));
-      menu_entries_length = menu_entries_lengthT;
-      for( uint32_t i = 0; i < menu_entries_length; i++){
-      offset += this->st_menu_entries.deserialize(inbuffer + offset);
-        memcpy( &(this->menu_entries[i]), &(this->st_menu_entries), sizeof(visualization_msgs::MenuEntry));
+      offset += 4;
+      menu_entries.resize(menu_entries_lengthT);
+      for( uint32_t i = 0; i < menu_entries.size(); i++){
+      offset += this->menu_entries[i].deserialize(inbuffer + offset);
       }
       uint32_t controls_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       controls_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       controls_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       controls_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->controls_length);
-      if(controls_lengthT > controls_length)
-        this->controls = (visualization_msgs::InteractiveMarkerControl*)realloc(this->controls, controls_lengthT * sizeof(visualization_msgs::InteractiveMarkerControl));
-      controls_length = controls_lengthT;
-      for( uint32_t i = 0; i < controls_length; i++){
-      offset += this->st_controls.deserialize(inbuffer + offset);
-        memcpy( &(this->controls[i]), &(this->st_controls), sizeof(visualization_msgs::InteractiveMarkerControl));
+      offset += 4;
+      controls.resize(controls_lengthT);
+      for( uint32_t i = 0; i < controls.size(); i++){
+      offset += this->controls[i].deserialize(inbuffer + offset);
       }
      return offset;
     }

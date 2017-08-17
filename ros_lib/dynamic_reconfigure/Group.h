@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "dynamic_reconfigure/ParamDescription.h"
 
@@ -17,10 +19,7 @@ namespace dynamic_reconfigure
       _name_type name;
       typedef const char* _type_type;
       _type_type type;
-      uint32_t parameters_length;
-      typedef dynamic_reconfigure::ParamDescription _parameters_type;
-      _parameters_type st_parameters;
-      _parameters_type * parameters;
+      std::vector<dynamic_reconfigure::ParamDescription> parameters;
       typedef int32_t _parent_type;
       _parent_type parent;
       typedef int32_t _id_type;
@@ -29,7 +28,7 @@ namespace dynamic_reconfigure
     Group():
       name(""),
       type(""),
-      parameters_length(0), parameters(NULL),
+      parameters(),
       parent(0),
       id(0)
     {
@@ -48,12 +47,12 @@ namespace dynamic_reconfigure
       offset += 4;
       memcpy(outbuffer + offset, this->type, length_type);
       offset += length_type;
-      *(outbuffer + offset + 0) = (this->parameters_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->parameters_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->parameters_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->parameters_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->parameters_length);
-      for( uint32_t i = 0; i < parameters_length; i++){
+      *(outbuffer + offset + 0) = (this->parameters.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->parameters.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->parameters.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->parameters.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < parameters.size(); i++){
       offset += this->parameters[i].serialize(outbuffer + offset);
       }
       union {
@@ -104,13 +103,10 @@ namespace dynamic_reconfigure
       parameters_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       parameters_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       parameters_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->parameters_length);
-      if(parameters_lengthT > parameters_length)
-        this->parameters = (dynamic_reconfigure::ParamDescription*)realloc(this->parameters, parameters_lengthT * sizeof(dynamic_reconfigure::ParamDescription));
-      parameters_length = parameters_lengthT;
-      for( uint32_t i = 0; i < parameters_length; i++){
-      offset += this->st_parameters.deserialize(inbuffer + offset);
-        memcpy( &(this->parameters[i]), &(this->st_parameters), sizeof(dynamic_reconfigure::ParamDescription));
+      offset += 4;
+      parameters.resize(parameters_lengthT);
+      for( uint32_t i = 0; i < parameters.size(); i++){
+      offset += this->parameters[i].deserialize(inbuffer + offset);
       }
       union {
         int32_t real;

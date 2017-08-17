@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "visualization_msgs/InteractiveMarker.h"
 
@@ -17,15 +19,12 @@ namespace visualization_msgs
       _server_id_type server_id;
       typedef uint64_t _seq_num_type;
       _seq_num_type seq_num;
-      uint32_t markers_length;
-      typedef visualization_msgs::InteractiveMarker _markers_type;
-      _markers_type st_markers;
-      _markers_type * markers;
+      std::vector<visualization_msgs::InteractiveMarker> markers;
 
     InteractiveMarkerInit():
       server_id(""),
       seq_num(0),
-      markers_length(0), markers(NULL)
+      markers()
     {
     }
 
@@ -47,12 +46,12 @@ namespace visualization_msgs
       *(outbuffer + offset + 2) = (u_seq_num.base >> (8 * 2)) & 0xFF;
       *(outbuffer + offset + 3) = (u_seq_num.base >> (8 * 3)) & 0xFF;
       offset += sizeof(this->seq_num);
-      *(outbuffer + offset + 0) = (this->markers_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->markers_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->markers_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->markers_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->markers_length);
-      for( uint32_t i = 0; i < markers_length; i++){
+      *(outbuffer + offset + 0) = (this->markers.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->markers.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->markers.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->markers.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < markers.size(); i++){
       offset += this->markers[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -85,13 +84,10 @@ namespace visualization_msgs
       markers_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       markers_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       markers_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->markers_length);
-      if(markers_lengthT > markers_length)
-        this->markers = (visualization_msgs::InteractiveMarker*)realloc(this->markers, markers_lengthT * sizeof(visualization_msgs::InteractiveMarker));
-      markers_length = markers_lengthT;
-      for( uint32_t i = 0; i < markers_length; i++){
-      offset += this->st_markers.deserialize(inbuffer + offset);
-        memcpy( &(this->markers[i]), &(this->st_markers), sizeof(visualization_msgs::InteractiveMarker));
+      offset += 4;
+      markers.resize(markers_lengthT);
+      for( uint32_t i = 0; i < markers.size(); i++){
+      offset += this->markers[i].deserialize(inbuffer + offset);
       }
      return offset;
     }

@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "shape_msgs/MeshTriangle.h"
 #include "geometry_msgs/Point.h"
@@ -14,38 +16,32 @@ namespace shape_msgs
   class Mesh : public ros::Msg
   {
     public:
-      uint32_t triangles_length;
-      typedef shape_msgs::MeshTriangle _triangles_type;
-      _triangles_type st_triangles;
-      _triangles_type * triangles;
-      uint32_t vertices_length;
-      typedef geometry_msgs::Point _vertices_type;
-      _vertices_type st_vertices;
-      _vertices_type * vertices;
+      std::vector<shape_msgs::MeshTriangle> triangles;
+      std::vector<geometry_msgs::Point> vertices;
 
     Mesh():
-      triangles_length(0), triangles(NULL),
-      vertices_length(0), vertices(NULL)
+      triangles(),
+      vertices()
     {
     }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      *(outbuffer + offset + 0) = (this->triangles_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->triangles_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->triangles_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->triangles_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->triangles_length);
-      for( uint32_t i = 0; i < triangles_length; i++){
+      *(outbuffer + offset + 0) = (this->triangles.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->triangles.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->triangles.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->triangles.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < triangles.size(); i++){
       offset += this->triangles[i].serialize(outbuffer + offset);
       }
-      *(outbuffer + offset + 0) = (this->vertices_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->vertices_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->vertices_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->vertices_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->vertices_length);
-      for( uint32_t i = 0; i < vertices_length; i++){
+      *(outbuffer + offset + 0) = (this->vertices.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->vertices.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->vertices.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->vertices.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < vertices.size(); i++){
       offset += this->vertices[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -58,25 +54,19 @@ namespace shape_msgs
       triangles_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       triangles_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       triangles_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->triangles_length);
-      if(triangles_lengthT > triangles_length)
-        this->triangles = (shape_msgs::MeshTriangle*)realloc(this->triangles, triangles_lengthT * sizeof(shape_msgs::MeshTriangle));
-      triangles_length = triangles_lengthT;
-      for( uint32_t i = 0; i < triangles_length; i++){
-      offset += this->st_triangles.deserialize(inbuffer + offset);
-        memcpy( &(this->triangles[i]), &(this->st_triangles), sizeof(shape_msgs::MeshTriangle));
+      offset += 4;
+      triangles.resize(triangles_lengthT);
+      for( uint32_t i = 0; i < triangles.size(); i++){
+      offset += this->triangles[i].deserialize(inbuffer + offset);
       }
       uint32_t vertices_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       vertices_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       vertices_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       vertices_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->vertices_length);
-      if(vertices_lengthT > vertices_length)
-        this->vertices = (geometry_msgs::Point*)realloc(this->vertices, vertices_lengthT * sizeof(geometry_msgs::Point));
-      vertices_length = vertices_lengthT;
-      for( uint32_t i = 0; i < vertices_length; i++){
-      offset += this->st_vertices.deserialize(inbuffer + offset);
-        memcpy( &(this->vertices[i]), &(this->st_vertices), sizeof(geometry_msgs::Point));
+      offset += 4;
+      vertices.resize(vertices_lengthT);
+      for( uint32_t i = 0; i < vertices.size(); i++){
+      offset += this->vertices[i].deserialize(inbuffer + offset);
       }
      return offset;
     }

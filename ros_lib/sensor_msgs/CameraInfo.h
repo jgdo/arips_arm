@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 #include "sensor_msgs/RegionOfInterest.h"
@@ -22,13 +24,10 @@ namespace sensor_msgs
       _width_type width;
       typedef const char* _distortion_model_type;
       _distortion_model_type distortion_model;
-      uint32_t D_length;
-      typedef float _D_type;
-      _D_type st_D;
-      _D_type * D;
-      float K[9];
-      float R[9];
-      float P[12];
+      std::vector<float> D;
+      std::array<float, 9> K;
+      std::array<float, 9> R;
+      std::array<float, 12> P;
       typedef uint32_t _binning_x_type;
       _binning_x_type binning_x;
       typedef uint32_t _binning_y_type;
@@ -41,7 +40,7 @@ namespace sensor_msgs
       height(0),
       width(0),
       distortion_model(""),
-      D_length(0), D(NULL),
+      D(),
       K(),
       R(),
       P(),
@@ -70,21 +69,21 @@ namespace sensor_msgs
       offset += 4;
       memcpy(outbuffer + offset, this->distortion_model, length_distortion_model);
       offset += length_distortion_model;
-      *(outbuffer + offset + 0) = (this->D_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->D_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->D_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->D_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->D_length);
-      for( uint32_t i = 0; i < D_length; i++){
+      *(outbuffer + offset + 0) = (this->D.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->D.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->D.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->D.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < D.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->D[i]);
       }
-      for( uint32_t i = 0; i < 9; i++){
+      for( uint32_t i = 0; i < K.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->K[i]);
       }
-      for( uint32_t i = 0; i < 9; i++){
+      for( uint32_t i = 0; i < R.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->R[i]);
       }
-      for( uint32_t i = 0; i < 12; i++){
+      for( uint32_t i = 0; i < P.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->P[i]);
       }
       *(outbuffer + offset + 0) = (this->binning_x >> (8 * 0)) & 0xFF;
@@ -128,21 +127,18 @@ namespace sensor_msgs
       D_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       D_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       D_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->D_length);
-      if(D_lengthT > D_length)
-        this->D = (float*)realloc(this->D, D_lengthT * sizeof(float));
-      D_length = D_lengthT;
-      for( uint32_t i = 0; i < D_length; i++){
-      offset += deserializeAvrFloat64(inbuffer + offset, &(this->st_D));
-        memcpy( &(this->D[i]), &(this->st_D), sizeof(float));
+      offset += 4;
+      D.resize(D_lengthT);
+      for( uint32_t i = 0; i < D.size(); i++){
+      offset += deserializeAvrFloat64(inbuffer + offset, &(this->D[i]));
       }
-      for( uint32_t i = 0; i < 9; i++){
+      for( uint32_t i = 0; i < K.size(); i++){
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->K[i]));
       }
-      for( uint32_t i = 0; i < 9; i++){
+      for( uint32_t i = 0; i < R.size(); i++){
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->R[i]));
       }
-      for( uint32_t i = 0; i < 12; i++){
+      for( uint32_t i = 0; i < P.size(); i++){
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->P[i]));
       }
       this->binning_x =  ((uint32_t) (*(inbuffer + offset)));

@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 
 namespace actionlib_tutorials
@@ -12,25 +14,22 @@ namespace actionlib_tutorials
   class FibonacciFeedback : public ros::Msg
   {
     public:
-      uint32_t sequence_length;
-      typedef int32_t _sequence_type;
-      _sequence_type st_sequence;
-      _sequence_type * sequence;
+      std::vector<int32_t> sequence;
 
     FibonacciFeedback():
-      sequence_length(0), sequence(NULL)
+      sequence()
     {
     }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      *(outbuffer + offset + 0) = (this->sequence_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->sequence_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->sequence_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->sequence_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->sequence_length);
-      for( uint32_t i = 0; i < sequence_length; i++){
+      *(outbuffer + offset + 0) = (this->sequence.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->sequence.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->sequence.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->sequence.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < sequence.size(); i++){
       union {
         int32_t real;
         uint32_t base;
@@ -52,23 +51,20 @@ namespace actionlib_tutorials
       sequence_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       sequence_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       sequence_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->sequence_length);
-      if(sequence_lengthT > sequence_length)
-        this->sequence = (int32_t*)realloc(this->sequence, sequence_lengthT * sizeof(int32_t));
-      sequence_length = sequence_lengthT;
-      for( uint32_t i = 0; i < sequence_length; i++){
+      offset += 4;
+      sequence.resize(sequence_lengthT);
+      for( uint32_t i = 0; i < sequence.size(); i++){
       union {
         int32_t real;
         uint32_t base;
-      } u_st_sequence;
-      u_st_sequence.base = 0;
-      u_st_sequence.base |= ((uint32_t) (*(inbuffer + offset + 0))) << (8 * 0);
-      u_st_sequence.base |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
-      u_st_sequence.base |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
-      u_st_sequence.base |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
-      this->st_sequence = u_st_sequence.real;
-      offset += sizeof(this->st_sequence);
-        memcpy( &(this->sequence[i]), &(this->st_sequence), sizeof(int32_t));
+      } u_sequencei;
+      u_sequencei.base = 0;
+      u_sequencei.base |= ((uint32_t) (*(inbuffer + offset + 0))) << (8 * 0);
+      u_sequencei.base |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
+      u_sequencei.base |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
+      u_sequencei.base |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
+      this->sequence[i] = u_sequencei.real;
+      offset += sizeof(this->sequence[i]);
       }
      return offset;
     }

@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 #include "diagnostic_msgs/DiagnosticStatus.h"
@@ -16,14 +18,11 @@ namespace diagnostic_msgs
     public:
       typedef std_msgs::Header _header_type;
       _header_type header;
-      uint32_t status_length;
-      typedef diagnostic_msgs::DiagnosticStatus _status_type;
-      _status_type st_status;
-      _status_type * status;
+      std::vector<diagnostic_msgs::DiagnosticStatus> status;
 
     DiagnosticArray():
       header(),
-      status_length(0), status(NULL)
+      status()
     {
     }
 
@@ -31,12 +30,12 @@ namespace diagnostic_msgs
     {
       int offset = 0;
       offset += this->header.serialize(outbuffer + offset);
-      *(outbuffer + offset + 0) = (this->status_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->status_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->status_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->status_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->status_length);
-      for( uint32_t i = 0; i < status_length; i++){
+      *(outbuffer + offset + 0) = (this->status.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->status.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->status.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->status.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < status.size(); i++){
       offset += this->status[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -50,13 +49,10 @@ namespace diagnostic_msgs
       status_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       status_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       status_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->status_length);
-      if(status_lengthT > status_length)
-        this->status = (diagnostic_msgs::DiagnosticStatus*)realloc(this->status, status_lengthT * sizeof(diagnostic_msgs::DiagnosticStatus));
-      status_length = status_lengthT;
-      for( uint32_t i = 0; i < status_length; i++){
-      offset += this->st_status.deserialize(inbuffer + offset);
-        memcpy( &(this->status[i]), &(this->st_status), sizeof(diagnostic_msgs::DiagnosticStatus));
+      offset += 4;
+      status.resize(status_lengthT);
+      for( uint32_t i = 0; i < status.size(); i++){
+      offset += this->status[i].deserialize(inbuffer + offset);
       }
      return offset;
     }

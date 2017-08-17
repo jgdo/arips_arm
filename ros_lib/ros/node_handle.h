@@ -129,13 +129,6 @@ namespace ros {
 
         for(unsigned int i=0; i< OUTPUT_SIZE; i++)
 	   message_out[i] = 0;
-
-        req_param_resp.ints_length = 0;
-        req_param_resp.ints = NULL;
-        req_param_resp.floats_length = 0;
-        req_param_resp.floats = NULL;
-        req_param_resp.ints_length = 0;
-        req_param_resp.ints = NULL;
       }
 
       Hardware* getHardware(){
@@ -171,9 +164,9 @@ namespace ros {
       bool configured_;
 
       /* used for syncing the time */
-      uint32_t last_sync_time;
-      uint32_t last_sync_receive_time;
-      uint32_t last_msg_timeout_time;
+      uint32_t last_sync_time = 0;
+      uint32_t last_sync_receive_time = 0;
+      uint32_t last_msg_timeout_time = 0;
 
     public:
       /* This function goes in your loop() function, it handles
@@ -508,7 +501,7 @@ namespace ros {
     public:
       bool getParam(const char* name, int* param, int length =1, int timeout = 1000){
         if (requestParam(name, timeout) ){
-          if (length == req_param_resp.ints_length){
+          if (length == req_param_resp.ints.size()){
             //copy it over
             for(int i=0; i<length; i++)
               param[i] = req_param_resp.ints[i];
@@ -521,7 +514,7 @@ namespace ros {
       }
       bool getParam(const char* name, float* param, int length=1, int timeout = 1000){
         if (requestParam(name, timeout) ){
-          if (length == req_param_resp.floats_length){
+          if (length == req_param_resp.floats.size()){
             //copy it over
             for(int i=0; i<length; i++)
               param[i] = req_param_resp.floats[i];
@@ -534,7 +527,7 @@ namespace ros {
       }
       bool getParam(const char* name, char** param, int length=1, int timeout = 1000){
         if (requestParam(name, timeout) ){
-          if (length == req_param_resp.strings_length){
+          if (length == req_param_resp.strings.size()){
             //copy it over
             for(int i=0; i<length; i++)
               strcpy(param[i],req_param_resp.strings[i]);

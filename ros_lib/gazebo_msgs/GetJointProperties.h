@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 
 namespace gazebo_msgs
@@ -57,18 +59,9 @@ static const char GETJOINTPROPERTIES[] = "gazebo_msgs/GetJointProperties";
     public:
       typedef uint8_t _type_type;
       _type_type type;
-      uint32_t damping_length;
-      typedef float _damping_type;
-      _damping_type st_damping;
-      _damping_type * damping;
-      uint32_t position_length;
-      typedef float _position_type;
-      _position_type st_position;
-      _position_type * position;
-      uint32_t rate_length;
-      typedef float _rate_type;
-      _rate_type st_rate;
-      _rate_type * rate;
+      std::vector<float> damping;
+      std::vector<float> position;
+      std::vector<float> rate;
       typedef bool _success_type;
       _success_type success;
       typedef const char* _status_message_type;
@@ -82,9 +75,9 @@ static const char GETJOINTPROPERTIES[] = "gazebo_msgs/GetJointProperties";
 
     GetJointPropertiesResponse():
       type(0),
-      damping_length(0), damping(NULL),
-      position_length(0), position(NULL),
-      rate_length(0), rate(NULL),
+      damping(),
+      position(),
+      rate(),
       success(0),
       status_message("")
     {
@@ -95,28 +88,28 @@ static const char GETJOINTPROPERTIES[] = "gazebo_msgs/GetJointProperties";
       int offset = 0;
       *(outbuffer + offset + 0) = (this->type >> (8 * 0)) & 0xFF;
       offset += sizeof(this->type);
-      *(outbuffer + offset + 0) = (this->damping_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->damping_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->damping_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->damping_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->damping_length);
-      for( uint32_t i = 0; i < damping_length; i++){
+      *(outbuffer + offset + 0) = (this->damping.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->damping.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->damping.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->damping.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < damping.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->damping[i]);
       }
-      *(outbuffer + offset + 0) = (this->position_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->position_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->position_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->position_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->position_length);
-      for( uint32_t i = 0; i < position_length; i++){
+      *(outbuffer + offset + 0) = (this->position.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->position.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->position.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->position.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < position.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->position[i]);
       }
-      *(outbuffer + offset + 0) = (this->rate_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->rate_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->rate_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->rate_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->rate_length);
-      for( uint32_t i = 0; i < rate_length; i++){
+      *(outbuffer + offset + 0) = (this->rate.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->rate.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->rate.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->rate.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < rate.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->rate[i]);
       }
       union {
@@ -143,37 +136,28 @@ static const char GETJOINTPROPERTIES[] = "gazebo_msgs/GetJointProperties";
       damping_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       damping_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       damping_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->damping_length);
-      if(damping_lengthT > damping_length)
-        this->damping = (float*)realloc(this->damping, damping_lengthT * sizeof(float));
-      damping_length = damping_lengthT;
-      for( uint32_t i = 0; i < damping_length; i++){
-      offset += deserializeAvrFloat64(inbuffer + offset, &(this->st_damping));
-        memcpy( &(this->damping[i]), &(this->st_damping), sizeof(float));
+      offset += 4;
+      damping.resize(damping_lengthT);
+      for( uint32_t i = 0; i < damping.size(); i++){
+      offset += deserializeAvrFloat64(inbuffer + offset, &(this->damping[i]));
       }
       uint32_t position_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       position_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       position_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       position_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->position_length);
-      if(position_lengthT > position_length)
-        this->position = (float*)realloc(this->position, position_lengthT * sizeof(float));
-      position_length = position_lengthT;
-      for( uint32_t i = 0; i < position_length; i++){
-      offset += deserializeAvrFloat64(inbuffer + offset, &(this->st_position));
-        memcpy( &(this->position[i]), &(this->st_position), sizeof(float));
+      offset += 4;
+      position.resize(position_lengthT);
+      for( uint32_t i = 0; i < position.size(); i++){
+      offset += deserializeAvrFloat64(inbuffer + offset, &(this->position[i]));
       }
       uint32_t rate_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       rate_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       rate_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       rate_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->rate_length);
-      if(rate_lengthT > rate_length)
-        this->rate = (float*)realloc(this->rate, rate_lengthT * sizeof(float));
-      rate_length = rate_lengthT;
-      for( uint32_t i = 0; i < rate_length; i++){
-      offset += deserializeAvrFloat64(inbuffer + offset, &(this->st_rate));
-        memcpy( &(this->rate[i]), &(this->st_rate), sizeof(float));
+      offset += 4;
+      rate.resize(rate_lengthT);
+      for( uint32_t i = 0; i < rate.size(); i++){
+      offset += deserializeAvrFloat64(inbuffer + offset, &(this->rate[i]));
       }
       union {
         bool real;

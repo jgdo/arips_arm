@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 #include "sensor_msgs/PointField.h"
@@ -20,20 +22,14 @@ namespace sensor_msgs
       _height_type height;
       typedef uint32_t _width_type;
       _width_type width;
-      uint32_t fields_length;
-      typedef sensor_msgs::PointField _fields_type;
-      _fields_type st_fields;
-      _fields_type * fields;
+      std::vector<sensor_msgs::PointField> fields;
       typedef bool _is_bigendian_type;
       _is_bigendian_type is_bigendian;
       typedef uint32_t _point_step_type;
       _point_step_type point_step;
       typedef uint32_t _row_step_type;
       _row_step_type row_step;
-      uint32_t data_length;
-      typedef uint8_t _data_type;
-      _data_type st_data;
-      _data_type * data;
+      std::vector<uint8_t> data;
       typedef bool _is_dense_type;
       _is_dense_type is_dense;
 
@@ -41,11 +37,11 @@ namespace sensor_msgs
       header(),
       height(0),
       width(0),
-      fields_length(0), fields(NULL),
+      fields(),
       is_bigendian(0),
       point_step(0),
       row_step(0),
-      data_length(0), data(NULL),
+      data(),
       is_dense(0)
     {
     }
@@ -64,12 +60,12 @@ namespace sensor_msgs
       *(outbuffer + offset + 2) = (this->width >> (8 * 2)) & 0xFF;
       *(outbuffer + offset + 3) = (this->width >> (8 * 3)) & 0xFF;
       offset += sizeof(this->width);
-      *(outbuffer + offset + 0) = (this->fields_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->fields_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->fields_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->fields_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->fields_length);
-      for( uint32_t i = 0; i < fields_length; i++){
+      *(outbuffer + offset + 0) = (this->fields.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->fields.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->fields.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->fields.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < fields.size(); i++){
       offset += this->fields[i].serialize(outbuffer + offset);
       }
       union {
@@ -89,12 +85,12 @@ namespace sensor_msgs
       *(outbuffer + offset + 2) = (this->row_step >> (8 * 2)) & 0xFF;
       *(outbuffer + offset + 3) = (this->row_step >> (8 * 3)) & 0xFF;
       offset += sizeof(this->row_step);
-      *(outbuffer + offset + 0) = (this->data_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->data_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->data_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->data_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->data_length);
-      for( uint32_t i = 0; i < data_length; i++){
+      *(outbuffer + offset + 0) = (this->data.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->data.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->data.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->data.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < data.size(); i++){
       *(outbuffer + offset + 0) = (this->data[i] >> (8 * 0)) & 0xFF;
       offset += sizeof(this->data[i]);
       }
@@ -126,13 +122,10 @@ namespace sensor_msgs
       fields_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       fields_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       fields_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->fields_length);
-      if(fields_lengthT > fields_length)
-        this->fields = (sensor_msgs::PointField*)realloc(this->fields, fields_lengthT * sizeof(sensor_msgs::PointField));
-      fields_length = fields_lengthT;
-      for( uint32_t i = 0; i < fields_length; i++){
-      offset += this->st_fields.deserialize(inbuffer + offset);
-        memcpy( &(this->fields[i]), &(this->st_fields), sizeof(sensor_msgs::PointField));
+      offset += 4;
+      fields.resize(fields_lengthT);
+      for( uint32_t i = 0; i < fields.size(); i++){
+      offset += this->fields[i].deserialize(inbuffer + offset);
       }
       union {
         bool real;
@@ -156,14 +149,11 @@ namespace sensor_msgs
       data_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       data_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       data_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->data_length);
-      if(data_lengthT > data_length)
-        this->data = (uint8_t*)realloc(this->data, data_lengthT * sizeof(uint8_t));
-      data_length = data_lengthT;
-      for( uint32_t i = 0; i < data_length; i++){
-      this->st_data =  ((uint8_t) (*(inbuffer + offset)));
-      offset += sizeof(this->st_data);
-        memcpy( &(this->data[i]), &(this->st_data), sizeof(uint8_t));
+      offset += 4;
+      data.resize(data_lengthT);
+      for( uint32_t i = 0; i < data.size(); i++){
+      this->data[i] =  ((uint8_t) (*(inbuffer + offset)));
+      offset += sizeof(this->data[i]);
       }
       union {
         bool real;

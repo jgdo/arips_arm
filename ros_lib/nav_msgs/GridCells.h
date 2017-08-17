@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 #include "geometry_msgs/Point.h"
@@ -20,16 +22,13 @@ namespace nav_msgs
       _cell_width_type cell_width;
       typedef float _cell_height_type;
       _cell_height_type cell_height;
-      uint32_t cells_length;
-      typedef geometry_msgs::Point _cells_type;
-      _cells_type st_cells;
-      _cells_type * cells;
+      std::vector<geometry_msgs::Point> cells;
 
     GridCells():
       header(),
       cell_width(0),
       cell_height(0),
-      cells_length(0), cells(NULL)
+      cells()
     {
     }
 
@@ -57,12 +56,12 @@ namespace nav_msgs
       *(outbuffer + offset + 2) = (u_cell_height.base >> (8 * 2)) & 0xFF;
       *(outbuffer + offset + 3) = (u_cell_height.base >> (8 * 3)) & 0xFF;
       offset += sizeof(this->cell_height);
-      *(outbuffer + offset + 0) = (this->cells_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->cells_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->cells_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->cells_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->cells_length);
-      for( uint32_t i = 0; i < cells_length; i++){
+      *(outbuffer + offset + 0) = (this->cells.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->cells.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->cells.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->cells.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < cells.size(); i++){
       offset += this->cells[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -98,13 +97,10 @@ namespace nav_msgs
       cells_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       cells_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       cells_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->cells_length);
-      if(cells_lengthT > cells_length)
-        this->cells = (geometry_msgs::Point*)realloc(this->cells, cells_lengthT * sizeof(geometry_msgs::Point));
-      cells_length = cells_lengthT;
-      for( uint32_t i = 0; i < cells_length; i++){
-      offset += this->st_cells.deserialize(inbuffer + offset);
-        memcpy( &(this->cells[i]), &(this->st_cells), sizeof(geometry_msgs::Point));
+      offset += 4;
+      cells.resize(cells_lengthT);
+      for( uint32_t i = 0; i < cells.size(); i++){
+      offset += this->cells[i].deserialize(inbuffer + offset);
       }
      return offset;
     }

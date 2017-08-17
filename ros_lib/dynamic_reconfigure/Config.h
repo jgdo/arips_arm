@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "dynamic_reconfigure/BoolParameter.h"
 #include "dynamic_reconfigure/IntParameter.h"
@@ -17,77 +19,62 @@ namespace dynamic_reconfigure
   class Config : public ros::Msg
   {
     public:
-      uint32_t bools_length;
-      typedef dynamic_reconfigure::BoolParameter _bools_type;
-      _bools_type st_bools;
-      _bools_type * bools;
-      uint32_t ints_length;
-      typedef dynamic_reconfigure::IntParameter _ints_type;
-      _ints_type st_ints;
-      _ints_type * ints;
-      uint32_t strs_length;
-      typedef dynamic_reconfigure::StrParameter _strs_type;
-      _strs_type st_strs;
-      _strs_type * strs;
-      uint32_t doubles_length;
-      typedef dynamic_reconfigure::DoubleParameter _doubles_type;
-      _doubles_type st_doubles;
-      _doubles_type * doubles;
-      uint32_t groups_length;
-      typedef dynamic_reconfigure::GroupState _groups_type;
-      _groups_type st_groups;
-      _groups_type * groups;
+      std::vector<dynamic_reconfigure::BoolParameter> bools;
+      std::vector<dynamic_reconfigure::IntParameter> ints;
+      std::vector<dynamic_reconfigure::StrParameter> strs;
+      std::vector<dynamic_reconfigure::DoubleParameter> doubles;
+      std::vector<dynamic_reconfigure::GroupState> groups;
 
     Config():
-      bools_length(0), bools(NULL),
-      ints_length(0), ints(NULL),
-      strs_length(0), strs(NULL),
-      doubles_length(0), doubles(NULL),
-      groups_length(0), groups(NULL)
+      bools(),
+      ints(),
+      strs(),
+      doubles(),
+      groups()
     {
     }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      *(outbuffer + offset + 0) = (this->bools_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->bools_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->bools_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->bools_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->bools_length);
-      for( uint32_t i = 0; i < bools_length; i++){
+      *(outbuffer + offset + 0) = (this->bools.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->bools.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->bools.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->bools.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < bools.size(); i++){
       offset += this->bools[i].serialize(outbuffer + offset);
       }
-      *(outbuffer + offset + 0) = (this->ints_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->ints_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->ints_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->ints_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->ints_length);
-      for( uint32_t i = 0; i < ints_length; i++){
+      *(outbuffer + offset + 0) = (this->ints.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->ints.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->ints.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->ints.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < ints.size(); i++){
       offset += this->ints[i].serialize(outbuffer + offset);
       }
-      *(outbuffer + offset + 0) = (this->strs_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->strs_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->strs_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->strs_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->strs_length);
-      for( uint32_t i = 0; i < strs_length; i++){
+      *(outbuffer + offset + 0) = (this->strs.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->strs.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->strs.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->strs.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < strs.size(); i++){
       offset += this->strs[i].serialize(outbuffer + offset);
       }
-      *(outbuffer + offset + 0) = (this->doubles_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->doubles_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->doubles_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->doubles_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->doubles_length);
-      for( uint32_t i = 0; i < doubles_length; i++){
+      *(outbuffer + offset + 0) = (this->doubles.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->doubles.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->doubles.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->doubles.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < doubles.size(); i++){
       offset += this->doubles[i].serialize(outbuffer + offset);
       }
-      *(outbuffer + offset + 0) = (this->groups_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->groups_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->groups_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->groups_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->groups_length);
-      for( uint32_t i = 0; i < groups_length; i++){
+      *(outbuffer + offset + 0) = (this->groups.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->groups.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->groups.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->groups.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < groups.size(); i++){
       offset += this->groups[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -100,61 +87,46 @@ namespace dynamic_reconfigure
       bools_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       bools_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       bools_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->bools_length);
-      if(bools_lengthT > bools_length)
-        this->bools = (dynamic_reconfigure::BoolParameter*)realloc(this->bools, bools_lengthT * sizeof(dynamic_reconfigure::BoolParameter));
-      bools_length = bools_lengthT;
-      for( uint32_t i = 0; i < bools_length; i++){
-      offset += this->st_bools.deserialize(inbuffer + offset);
-        memcpy( &(this->bools[i]), &(this->st_bools), sizeof(dynamic_reconfigure::BoolParameter));
+      offset += 4;
+      bools.resize(bools_lengthT);
+      for( uint32_t i = 0; i < bools.size(); i++){
+      offset += this->bools[i].deserialize(inbuffer + offset);
       }
       uint32_t ints_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       ints_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       ints_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       ints_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->ints_length);
-      if(ints_lengthT > ints_length)
-        this->ints = (dynamic_reconfigure::IntParameter*)realloc(this->ints, ints_lengthT * sizeof(dynamic_reconfigure::IntParameter));
-      ints_length = ints_lengthT;
-      for( uint32_t i = 0; i < ints_length; i++){
-      offset += this->st_ints.deserialize(inbuffer + offset);
-        memcpy( &(this->ints[i]), &(this->st_ints), sizeof(dynamic_reconfigure::IntParameter));
+      offset += 4;
+      ints.resize(ints_lengthT);
+      for( uint32_t i = 0; i < ints.size(); i++){
+      offset += this->ints[i].deserialize(inbuffer + offset);
       }
       uint32_t strs_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       strs_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       strs_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       strs_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->strs_length);
-      if(strs_lengthT > strs_length)
-        this->strs = (dynamic_reconfigure::StrParameter*)realloc(this->strs, strs_lengthT * sizeof(dynamic_reconfigure::StrParameter));
-      strs_length = strs_lengthT;
-      for( uint32_t i = 0; i < strs_length; i++){
-      offset += this->st_strs.deserialize(inbuffer + offset);
-        memcpy( &(this->strs[i]), &(this->st_strs), sizeof(dynamic_reconfigure::StrParameter));
+      offset += 4;
+      strs.resize(strs_lengthT);
+      for( uint32_t i = 0; i < strs.size(); i++){
+      offset += this->strs[i].deserialize(inbuffer + offset);
       }
       uint32_t doubles_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       doubles_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       doubles_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       doubles_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->doubles_length);
-      if(doubles_lengthT > doubles_length)
-        this->doubles = (dynamic_reconfigure::DoubleParameter*)realloc(this->doubles, doubles_lengthT * sizeof(dynamic_reconfigure::DoubleParameter));
-      doubles_length = doubles_lengthT;
-      for( uint32_t i = 0; i < doubles_length; i++){
-      offset += this->st_doubles.deserialize(inbuffer + offset);
-        memcpy( &(this->doubles[i]), &(this->st_doubles), sizeof(dynamic_reconfigure::DoubleParameter));
+      offset += 4;
+      doubles.resize(doubles_lengthT);
+      for( uint32_t i = 0; i < doubles.size(); i++){
+      offset += this->doubles[i].deserialize(inbuffer + offset);
       }
       uint32_t groups_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       groups_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       groups_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       groups_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->groups_length);
-      if(groups_lengthT > groups_length)
-        this->groups = (dynamic_reconfigure::GroupState*)realloc(this->groups, groups_lengthT * sizeof(dynamic_reconfigure::GroupState));
-      groups_length = groups_lengthT;
-      for( uint32_t i = 0; i < groups_length; i++){
-      offset += this->st_groups.deserialize(inbuffer + offset);
-        memcpy( &(this->groups[i]), &(this->st_groups), sizeof(dynamic_reconfigure::GroupState));
+      offset += 4;
+      groups.resize(groups_lengthT);
+      for( uint32_t i = 0; i < groups.size(); i++){
+      offset += this->groups[i].deserialize(inbuffer + offset);
       }
      return offset;
     }

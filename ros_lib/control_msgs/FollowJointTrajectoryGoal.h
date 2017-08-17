@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "trajectory_msgs/JointTrajectory.h"
 #include "control_msgs/JointTolerance.h"
@@ -17,21 +19,15 @@ namespace control_msgs
     public:
       typedef trajectory_msgs::JointTrajectory _trajectory_type;
       _trajectory_type trajectory;
-      uint32_t path_tolerance_length;
-      typedef control_msgs::JointTolerance _path_tolerance_type;
-      _path_tolerance_type st_path_tolerance;
-      _path_tolerance_type * path_tolerance;
-      uint32_t goal_tolerance_length;
-      typedef control_msgs::JointTolerance _goal_tolerance_type;
-      _goal_tolerance_type st_goal_tolerance;
-      _goal_tolerance_type * goal_tolerance;
+      std::vector<control_msgs::JointTolerance> path_tolerance;
+      std::vector<control_msgs::JointTolerance> goal_tolerance;
       typedef ros::Duration _goal_time_tolerance_type;
       _goal_time_tolerance_type goal_time_tolerance;
 
     FollowJointTrajectoryGoal():
       trajectory(),
-      path_tolerance_length(0), path_tolerance(NULL),
-      goal_tolerance_length(0), goal_tolerance(NULL),
+      path_tolerance(),
+      goal_tolerance(),
       goal_time_tolerance()
     {
     }
@@ -40,20 +36,20 @@ namespace control_msgs
     {
       int offset = 0;
       offset += this->trajectory.serialize(outbuffer + offset);
-      *(outbuffer + offset + 0) = (this->path_tolerance_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->path_tolerance_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->path_tolerance_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->path_tolerance_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->path_tolerance_length);
-      for( uint32_t i = 0; i < path_tolerance_length; i++){
+      *(outbuffer + offset + 0) = (this->path_tolerance.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->path_tolerance.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->path_tolerance.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->path_tolerance.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < path_tolerance.size(); i++){
       offset += this->path_tolerance[i].serialize(outbuffer + offset);
       }
-      *(outbuffer + offset + 0) = (this->goal_tolerance_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->goal_tolerance_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->goal_tolerance_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->goal_tolerance_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->goal_tolerance_length);
-      for( uint32_t i = 0; i < goal_tolerance_length; i++){
+      *(outbuffer + offset + 0) = (this->goal_tolerance.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->goal_tolerance.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->goal_tolerance.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->goal_tolerance.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < goal_tolerance.size(); i++){
       offset += this->goal_tolerance[i].serialize(outbuffer + offset);
       }
       *(outbuffer + offset + 0) = (this->goal_time_tolerance.sec >> (8 * 0)) & 0xFF;
@@ -77,25 +73,19 @@ namespace control_msgs
       path_tolerance_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       path_tolerance_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       path_tolerance_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->path_tolerance_length);
-      if(path_tolerance_lengthT > path_tolerance_length)
-        this->path_tolerance = (control_msgs::JointTolerance*)realloc(this->path_tolerance, path_tolerance_lengthT * sizeof(control_msgs::JointTolerance));
-      path_tolerance_length = path_tolerance_lengthT;
-      for( uint32_t i = 0; i < path_tolerance_length; i++){
-      offset += this->st_path_tolerance.deserialize(inbuffer + offset);
-        memcpy( &(this->path_tolerance[i]), &(this->st_path_tolerance), sizeof(control_msgs::JointTolerance));
+      offset += 4;
+      path_tolerance.resize(path_tolerance_lengthT);
+      for( uint32_t i = 0; i < path_tolerance.size(); i++){
+      offset += this->path_tolerance[i].deserialize(inbuffer + offset);
       }
       uint32_t goal_tolerance_lengthT = ((uint32_t) (*(inbuffer + offset))); 
       goal_tolerance_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       goal_tolerance_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       goal_tolerance_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->goal_tolerance_length);
-      if(goal_tolerance_lengthT > goal_tolerance_length)
-        this->goal_tolerance = (control_msgs::JointTolerance*)realloc(this->goal_tolerance, goal_tolerance_lengthT * sizeof(control_msgs::JointTolerance));
-      goal_tolerance_length = goal_tolerance_lengthT;
-      for( uint32_t i = 0; i < goal_tolerance_length; i++){
-      offset += this->st_goal_tolerance.deserialize(inbuffer + offset);
-        memcpy( &(this->goal_tolerance[i]), &(this->st_goal_tolerance), sizeof(control_msgs::JointTolerance));
+      offset += 4;
+      goal_tolerance.resize(goal_tolerance_lengthT);
+      for( uint32_t i = 0; i < goal_tolerance.size(); i++){
+      offset += this->goal_tolerance[i].deserialize(inbuffer + offset);
       }
       this->goal_time_tolerance.sec =  ((uint32_t) (*(inbuffer + offset)));
       this->goal_time_tolerance.sec |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);

@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 
 namespace topic_tools
@@ -38,25 +40,22 @@ static const char MUXLIST[] = "topic_tools/MuxList";
   class MuxListResponse : public ros::Msg
   {
     public:
-      uint32_t topics_length;
-      typedef char* _topics_type;
-      _topics_type st_topics;
-      _topics_type * topics;
+      std::vector<char*> topics;
 
     MuxListResponse():
-      topics_length(0), topics(NULL)
+      topics()
     {
     }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      *(outbuffer + offset + 0) = (this->topics_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->topics_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->topics_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->topics_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->topics_length);
-      for( uint32_t i = 0; i < topics_length; i++){
+      *(outbuffer + offset + 0) = (this->topics.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->topics.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->topics.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->topics.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < topics.size(); i++){
       uint32_t length_topicsi = strlen(this->topics[i]);
       varToArr(outbuffer + offset, length_topicsi);
       offset += 4;
@@ -73,21 +72,18 @@ static const char MUXLIST[] = "topic_tools/MuxList";
       topics_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       topics_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       topics_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->topics_length);
-      if(topics_lengthT > topics_length)
-        this->topics = (char**)realloc(this->topics, topics_lengthT * sizeof(char*));
-      topics_length = topics_lengthT;
-      for( uint32_t i = 0; i < topics_length; i++){
-      uint32_t length_st_topics;
-      arrToVar(length_st_topics, (inbuffer + offset));
       offset += 4;
-      for(unsigned int k= offset; k< offset+length_st_topics; ++k){
+      topics.resize(topics_lengthT);
+      for( uint32_t i = 0; i < topics.size(); i++){
+      uint32_t length_topicsi;
+      arrToVar(length_topicsi, (inbuffer + offset));
+      offset += 4;
+      for(unsigned int k= offset; k< offset+length_topicsi; ++k){
           inbuffer[k-1]=inbuffer[k];
       }
-      inbuffer[offset+length_st_topics-1]=0;
-      this->st_topics = (char *)(inbuffer + offset-1);
-      offset += length_st_topics;
-        memcpy( &(this->topics[i]), &(this->st_topics), sizeof(char*));
+      inbuffer[offset+length_topicsi-1]=0;
+      this->topics[i] = (char *)(inbuffer + offset-1);
+      offset += length_topicsi;
       }
      return offset;
     }

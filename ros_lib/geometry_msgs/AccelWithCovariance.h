@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "geometry_msgs/Accel.h"
 
@@ -15,7 +17,7 @@ namespace geometry_msgs
     public:
       typedef geometry_msgs::Accel _accel_type;
       _accel_type accel;
-      float covariance[36];
+      std::array<float, 36> covariance;
 
     AccelWithCovariance():
       accel(),
@@ -27,7 +29,7 @@ namespace geometry_msgs
     {
       int offset = 0;
       offset += this->accel.serialize(outbuffer + offset);
-      for( uint32_t i = 0; i < 36; i++){
+      for( uint32_t i = 0; i < covariance.size(); i++){
       offset += serializeAvrFloat64(outbuffer + offset, this->covariance[i]);
       }
       return offset;
@@ -37,7 +39,7 @@ namespace geometry_msgs
     {
       int offset = 0;
       offset += this->accel.deserialize(inbuffer + offset);
-      for( uint32_t i = 0; i < 36; i++){
+      for( uint32_t i = 0; i < covariance.size(); i++){
       offset += deserializeAvrFloat64(inbuffer + offset, &(this->covariance[i]));
       }
      return offset;

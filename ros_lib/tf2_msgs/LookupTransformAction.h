@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "tf2_msgs/LookupTransformActionGoal.h"
 #include "tf2_msgs/LookupTransformActionResult.h"

@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "std_msgs/Header.h"
 
@@ -15,14 +17,11 @@ namespace pcl_msgs
     public:
       typedef std_msgs::Header _header_type;
       _header_type header;
-      uint32_t indices_length;
-      typedef int32_t _indices_type;
-      _indices_type st_indices;
-      _indices_type * indices;
+      std::vector<int32_t> indices;
 
     PointIndices():
       header(),
-      indices_length(0), indices(NULL)
+      indices()
     {
     }
 
@@ -30,12 +29,12 @@ namespace pcl_msgs
     {
       int offset = 0;
       offset += this->header.serialize(outbuffer + offset);
-      *(outbuffer + offset + 0) = (this->indices_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->indices_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->indices_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->indices_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->indices_length);
-      for( uint32_t i = 0; i < indices_length; i++){
+      *(outbuffer + offset + 0) = (this->indices.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->indices.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->indices.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->indices.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < indices.size(); i++){
       union {
         int32_t real;
         uint32_t base;
@@ -58,23 +57,20 @@ namespace pcl_msgs
       indices_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       indices_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       indices_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->indices_length);
-      if(indices_lengthT > indices_length)
-        this->indices = (int32_t*)realloc(this->indices, indices_lengthT * sizeof(int32_t));
-      indices_length = indices_lengthT;
-      for( uint32_t i = 0; i < indices_length; i++){
+      offset += 4;
+      indices.resize(indices_lengthT);
+      for( uint32_t i = 0; i < indices.size(); i++){
       union {
         int32_t real;
         uint32_t base;
-      } u_st_indices;
-      u_st_indices.base = 0;
-      u_st_indices.base |= ((uint32_t) (*(inbuffer + offset + 0))) << (8 * 0);
-      u_st_indices.base |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
-      u_st_indices.base |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
-      u_st_indices.base |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
-      this->st_indices = u_st_indices.real;
-      offset += sizeof(this->st_indices);
-        memcpy( &(this->indices[i]), &(this->st_indices), sizeof(int32_t));
+      } u_indicesi;
+      u_indicesi.base = 0;
+      u_indicesi.base |= ((uint32_t) (*(inbuffer + offset + 0))) << (8 * 0);
+      u_indicesi.base |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
+      u_indicesi.base |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
+      u_indicesi.base |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
+      this->indices[i] = u_indicesi.real;
+      offset += sizeof(this->indices[i]);
       }
      return offset;
     }

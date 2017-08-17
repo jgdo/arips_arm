@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <array>
+#include <vector>
 #include "ros/msg.h"
 #include "arips_msgs/MotorPWMRaw.h"
 
@@ -13,25 +15,22 @@ namespace arips_msgs
   class MotorPWMRawArray : public ros::Msg
   {
     public:
-      uint32_t motor_pwm_length;
-      typedef arips_msgs::MotorPWMRaw _motor_pwm_type;
-      _motor_pwm_type st_motor_pwm;
-      _motor_pwm_type * motor_pwm;
+      std::vector<arips_msgs::MotorPWMRaw> motor_pwm;
 
     MotorPWMRawArray():
-      motor_pwm_length(0), motor_pwm(NULL)
+      motor_pwm()
     {
     }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      *(outbuffer + offset + 0) = (this->motor_pwm_length >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (this->motor_pwm_length >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (this->motor_pwm_length >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (this->motor_pwm_length >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->motor_pwm_length);
-      for( uint32_t i = 0; i < motor_pwm_length; i++){
+      *(outbuffer + offset + 0) = (this->motor_pwm.size() >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (this->motor_pwm.size() >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (this->motor_pwm.size() >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (this->motor_pwm.size() >> (8 * 3)) & 0xFF;
+      offset += 4;
+      for( uint32_t i = 0; i < motor_pwm.size(); i++){
       offset += this->motor_pwm[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -44,13 +43,10 @@ namespace arips_msgs
       motor_pwm_lengthT |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1); 
       motor_pwm_lengthT |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2); 
       motor_pwm_lengthT |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3); 
-      offset += sizeof(this->motor_pwm_length);
-      if(motor_pwm_lengthT > motor_pwm_length)
-        this->motor_pwm = (arips_msgs::MotorPWMRaw*)realloc(this->motor_pwm, motor_pwm_lengthT * sizeof(arips_msgs::MotorPWMRaw));
-      motor_pwm_length = motor_pwm_lengthT;
-      for( uint32_t i = 0; i < motor_pwm_length; i++){
-      offset += this->st_motor_pwm.deserialize(inbuffer + offset);
-        memcpy( &(this->motor_pwm[i]), &(this->st_motor_pwm), sizeof(arips_msgs::MotorPWMRaw));
+      offset += 4;
+      motor_pwm.resize(motor_pwm_lengthT);
+      for( uint32_t i = 0; i < motor_pwm.size(); i++){
+      offset += this->motor_pwm[i].deserialize(inbuffer + offset);
       }
      return offset;
     }
