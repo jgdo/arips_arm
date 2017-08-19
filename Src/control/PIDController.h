@@ -10,7 +10,12 @@
 
 #include <control/Controller.h>
 
+#include <utl/ParameterStore.h>
+
 namespace ctrl {
+struct PIDParameters {
+	float P = 5, I = 0.3, D=50;
+};
 
 class PIDController: public Controller {
 public:
@@ -21,11 +26,18 @@ public:
 	virtual float control(float input, float setpoint) override;
 	
 private:
+	utl::ParameterServer<PIDParameters> server;
+	
 	float outMin, outMax;
+	
+	
+	
 	float last = 0.5;
 	float isum = 0;
 		
-	float P = 5, I = 0.3, D=50;
+	
+	
+	PIDParameters params;
 };
 
 } /* namespace ctrl */

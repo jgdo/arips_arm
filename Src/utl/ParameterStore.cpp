@@ -1,21 +1,48 @@
 /*
  * ParameterStore.cpp
  *
- *  Created on: Aug 12, 2017
+ *  Created on: Aug 19, 2017
  *      Author: jgdo
  */
 
-#include <utl/ParameterStore.h>
-
-#include <control/PIDController.h>
+#include "ParameterStore.h"
 
 namespace utl {
 
-std::array<ParameterEntry*, PS_ID_END>& ParameterStore::storeEntries() {
-	static ParameterEntryImpl<float> pid_p = 50, pid_i = 0.3, pid_d = 200, setpoint = 0.0;
-	
-	static std::array<ParameterEntry*, PS_ID_END> entries = {&pid_p, &pid_i, &pid_d, &setpoint};
-	return entries;
+template<>
+const char* getParamTypeName<int>() {
+	return "int";
 }
 
-} /* namespace utl */
+template<>
+const char* getParamTypeName<double>() {
+	return "double";
+}
+
+template<>
+const char* getParamTypeName<float>() {
+	return "double";
+}
+
+template<>
+void addParamToConfig<int>(const char* name, int value, dynamic_reconfigure::Config& paramList) {
+	paramList.ints.resize(paramList.ints.size() + 1);
+	paramList.ints.back().name = name;
+	paramList.ints.back().value = value;
+}
+
+template<>
+void addParamToConfig<float>(const char* name, float value, dynamic_reconfigure::Config& paramList) {
+	paramList.doubles.resize(paramList.doubles.size() + 1);
+	paramList.doubles.back().name = name;
+	paramList.doubles.back().value = value;
+}
+
+template<>
+void addParamToConfig<double>(const char* name, double value, dynamic_reconfigure::Config& paramList) {
+	paramList.doubles.resize(paramList.doubles.size() + 1);
+	paramList.doubles.back().name = name;
+	paramList.doubles.back().value = value;
+}
+
+}

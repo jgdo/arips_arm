@@ -10,8 +10,6 @@
 #include "hw/ControllerHardware.h"
 #include "control/PIDController.h"
 
-#include "utl/ROSParameterStoreHandler.h"
-
 using ros::nh;
 
 extern "C" {
@@ -29,7 +27,7 @@ int cpp_main() {
 	nh.initNode();
 	nh.advertise(chatter);
 	
-	utl::ROSParameterStoreHandler psh;
+	// utl::ROSParameterStoreHandler psh;
 	
 	ctrl::PIDController pid(-1, 1);
 	
@@ -38,9 +36,9 @@ int cpp_main() {
 
 		auto adc = hw::adc::getAll();
 
-		float setpoint = utl::ParameterStore::get<float>(utl::PS_ID_SETPOINT);
-		if(setpoint == 0.0f)
-			setpoint = adc[0] / 4096.0f;
+		//float setpoint = utl::ParameterStore::get<float>(utl::PS_ID_SETPOINT);
+		//if(setpoint == 0.0f)
+		float	setpoint = adc[0] / 4096.0f;
 		
 		float out = pid.control(adc[1] / 4096.0f, setpoint);
 		hw::l298motor0.set(out);

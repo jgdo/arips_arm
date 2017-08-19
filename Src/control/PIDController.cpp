@@ -11,17 +11,28 @@
 
 #include <utl/ParameterStore.h>
 
+DECL_PARAM_NAME(ctrl::PIDParameters, float, P, 50, 0, 100);
+DECL_PARAM_NAME(ctrl::PIDParameters, float, I, 0.3, 0, 4);
+DECL_PARAM_NAME(ctrl::PIDParameters, float, D, 150, 0, 500);
+
+template<>
+struct UtlParamList<ctrl::PIDParameters> {
+    typedef utl::ParamPack<
+        utl::MemberParam<float, ctrl::PIDParameters, &ctrl::PIDParameters::P>,
+        utl::MemberParam<float, ctrl::PIDParameters, &ctrl::PIDParameters::I>,
+        utl::MemberParam<float, ctrl::PIDParameters, &ctrl::PIDParameters::D>
+    > List;
+};
+
 namespace ctrl {
 
 float PIDController::control(float input, float setpoint) {	
-	P = utl::ParameterStore::get<float>(utl::PS_ID_PID_P);
-	I = utl::ParameterStore::get<float>(utl::PS_ID_PID_I);
-	D = utl::ParameterStore::get<float>(utl::PS_ID_PID_D);
+	server.getConfig(params);
 	
 	float err = setpoint-input;
 	
 	float d = last - input;
-	isum += err *I;
+	isum += err *params.I;
 
 	if(isum > 0.5)
 		isum = .0f;
@@ -30,7 +41,7 @@ float PIDController::control(float input, float setpoint) {
 
 	last = input;
 	
-	float out = err*P + isum + d * D;
+	float out = err*params.P + isum + d * params.D;
 	
 	// anti-windup
 	if(out < outMin) {
