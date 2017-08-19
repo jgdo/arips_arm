@@ -78,3 +78,7 @@ void ctrl::PIDController::reset() {
 	isum = 0;
 	last = 0;
 }
+
+void ctrl::PIDController::pubserver() {
+	server.PublishDescription();
+}

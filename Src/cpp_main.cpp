@@ -38,18 +38,22 @@ int cpp_main() {
 
 		//float setpoint = utl::ParameterStore::get<float>(utl::PS_ID_SETPOINT);
 		//if(setpoint == 0.0f)
-		float	setpoint = adc[0] / 4096.0f;
-		
-		float out = pid.control(adc[1] / 4096.0f, setpoint);
-		hw::l298motor0.set(out);
-		
-		msg.stamp = nh.now();
-		msg.adc_raw[0] = adc[0];
-		msg.adc_raw[1] = adc[1];
-		msg.adc[0] = adc[0] / 4096.0f;
-		msg.adc[1] = adc[1] / 4096.0f;
-		msg.out[0] = out;
-		chatter.publish(&msg);
+		  float setpoint = adc[0] / 4096.0f;
+
+		  float out = pid.control(adc[1] / 4096.0f, setpoint);
+		  hw::l298motor0.set(out);
+
+		  msg.stamp = nh.now();
+		  msg.adc_raw[0] = adc[0];
+		  msg.adc_raw[1] = adc[1];
+		  msg.adc[0] = adc[0] / 4096.0f;
+		  msg.adc[1] = adc[1] / 4096.0f;
+		  msg.out[0] = out;
+		  chatter.publish(&msg);
+	  });
+	
+	auto handleparam = SysTickTimer::createTimer(1000, [&]() {
+		pid.pubserver();
 	});
 	
 	while (1) {

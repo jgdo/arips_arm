@@ -14,7 +14,7 @@
 
 namespace ctrl {
 struct PIDParameters {
-	float P = 5, I = 0.3, D=50;
+	float P = 40, I = 0.2, D=150;
 };
 
 class PIDController: public Controller {
@@ -24,6 +24,8 @@ public:
 	virtual void reset() override;
 	
 	virtual float control(float input, float setpoint) override;
+	
+	void pubserver();
 	
 private:
 	utl::ParameterServer<PIDParameters> server;

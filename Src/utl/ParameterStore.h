@@ -240,9 +240,9 @@ template<class ConfigType>
 class ParameterServer {
 public:
 	ParameterServer() :
-			set_service_("set_parameters", &ParameterServer::setConfigCallback, this), 
-			update_pub_("parameter_updates", &update_msg), 
-			descr_pub_("parameter_descriptions", &descr_msg) {
+			set_service_("/pid/set_parameters", &ParameterServer::setConfigCallback, this), 
+			update_pub_("/pid/parameter_updates", &update_msg), 
+			descr_pub_("/pid/parameter_descriptions", &descr_msg) {
 		init();
 	}
 	
@@ -299,12 +299,35 @@ public:
 	 PublishDescription();
 	 } */
 
+	void PublishDescription() {
+			if(description_message.groups.empty()) {
+			//Copy over min_ max_ default_
+			
+				// fill groups
+				description_message.groups.resize(1);
+				description_message.groups[0].name = "Default";
+				description_message.groups[0].type = "";
+				UtlParamList<ConfigType>::List::fillParamDescriptionList(description_message.groups[0].parameters);
+				description_message.groups[0].parent = 0;
+				description_message.groups[0].id = 0;
+				
+				UtlParamList<ConfigType>::List::fillParamMinList(description_message.min);
+				UtlParamList<ConfigType>::List::fillParamMaxList(description_message.max);
+				UtlParamList<ConfigType>::List::fillParamDefaultList(description_message.dflt);
+			}
+			
+			//Publish description
+			descr_pub_.publish(&description_message);
+		}
+	
 private:
 	ros::ServiceServer<dynamic_reconfigure::Reconfigure::Request, dynamic_reconfigure::Reconfigure::Response,
 	    ParameterServer> set_service_;
 
 	dynamic_reconfigure::Config update_msg;
 	dynamic_reconfigure::ConfigDescription descr_msg;
+	
+	dynamic_reconfigure::ConfigDescription description_message;
 
 	ros::Publisher update_pub_;
 	ros::Publisher descr_pub_;
@@ -315,24 +338,7 @@ private:
 	 ConfigType max_;
 	 ConfigType default_; */
 
-	void PublishDescription() {
-		//Copy over min_ max_ default_
-		dynamic_reconfigure::ConfigDescription description_message;
-		// fill groups
-		description_message.groups.resize(1);
-		description_message.groups[0].name = "Default";
-		description_message.groups[0].type = "";
-		UtlParamList<ConfigType>::List::fillParamDescriptionList(description_message.groups[0].parameters);
-		description_message.groups[0].parent = 0;
-		description_message.groups[0].id = 0;
-		
-		UtlParamList<ConfigType>::List::fillParamMinList(description_message.min);
-		UtlParamList<ConfigType>::List::fillParamMaxList(description_message.max);
-		UtlParamList<ConfigType>::List::fillParamDefaultList(description_message.dflt);
-		
-		//Publish description
-		descr_pub_.publish(&description_message);
-	}
+	
 	
 	void init() {
 		//Grab copys of the data from the config files.  These are declared in the generated config file.
@@ -348,6 +354,8 @@ private:
 		
 		ros::nh.advertise(descr_pub_);
 		ros::nh.advertise(update_pub_);
+		
+		PublishDescription();
 		
 		ConfigType init_config;
 		// TODO init config type
@@ -389,7 +397,7 @@ private:
 		updateConfigInternal(new_config);
 		
 		UtlParamList<ConfigType>::List::fillParamValueList(&new_config, rsp.config);
-		update_pub_.publish(&rsp.config);
+		//update_pub_.publish(&rsp.config);
 	}
 	
 	void updateConfigInternal(const ConfigType &config) {
