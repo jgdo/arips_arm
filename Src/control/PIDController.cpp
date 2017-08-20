@@ -71,7 +71,7 @@ float PIDController::control(float input, float setpoint) {
 
 } /* namespace ctrl */
 
-ctrl::PIDController::PIDController(float outMin, float outMax): outMin(outMin), outMax(outMax) {
+ctrl::PIDController::PIDController(float outMin, float outMax): server("pid"), outMin(outMin), outMax(outMax) {
 }
 
 void ctrl::PIDController::reset() {
