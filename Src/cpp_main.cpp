@@ -53,10 +53,6 @@ int cpp_main() {
 		  chatter.publish(&msg);
 	  });
 	
-	auto handleparam = SysTickTimer::createTimer(1000, [&]() {
-		pid.pubserver();
-	});
-	
 	while (1) {
 		SysTickTimer::handleTimers();
 		nh.spinOnce();

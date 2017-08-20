@@ -48,6 +48,7 @@
 #include <dynamic_reconfigure/ConfigDescription.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <utl/String.h>
+#include <utl/Timer.h>
 
 /**
  * @todo Add diagnostics.
@@ -240,12 +241,14 @@ template<class ConfigType>
 class ParameterServer {
 public:
 	ParameterServer(const char* name) :
-		serviceName("%s/set_parameters", name),
-		updateName("%s/parameter_updates", name),
-		descrName("%s/parameter_descriptions", name),
-			set_service_(serviceName.data(), &ParameterServer::setConfigCallback, this), update_pub_(
-					updateName.data(), &update_msg), descr_pub_(descrName.data(), &descr_msg) {
+			serviceName("%s/set_parameters", name), updateName("%s/parameter_updates", name), descrName(
+			    "%s/parameter_descriptions", name), set_service_(serviceName.data(), &ParameterServer::setConfigCallback,
+			    this), update_pub_(updateName.data(), &update_msg), descr_pub_(descrName.data(), &descr_msg) {
 		init();
+		
+		pubTimerHandle = SysTickTimer::createTimer(2123, [this]() {
+			PublishDescription();
+		});
 	}
 	
 	// TODO typedef boost::function<void(ConfigType &, uint32_t level)> CallbackType;
@@ -339,6 +342,8 @@ private:
 	ros::Publisher descr_pub_;
 	// TODO CallbackType callback_;
 	ConfigType config_;
+
+	SysTickTimerHandle pubTimerHandle;
 
 	/*
 	 ConfigType min_;

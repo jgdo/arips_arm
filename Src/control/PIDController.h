@@ -25,8 +25,6 @@ public:
 	
 	virtual float control(float input, float setpoint) override;
 	
-	void pubserver();
-	
 private:
 	utl::ParameterServer<PIDParameters> server;
 	
@@ -36,7 +34,7 @@ private:
 	
 	float last = 0.5;
 	float isum = 0;
-		
+	
 	
 	
 	PIDParameters params;

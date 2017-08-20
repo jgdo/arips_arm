@@ -9,8 +9,6 @@
 
 #include <control/PIDController.h>
 
-#include <utl/ParameterStore.h>
-
 DECL_PARAM_NAME(ctrl::PIDParameters, float, P, 50, 0, 100);
 DECL_PARAM_NAME(ctrl::PIDParameters, float, I, 0.3, 0, 4);
 DECL_PARAM_NAME(ctrl::PIDParameters, float, D, 150, 0, 500);
@@ -77,8 +75,4 @@ ctrl::PIDController::PIDController(float outMin, float outMax): server("pid"), o
 void ctrl::PIDController::reset() {
 	isum = 0;
 	last = 0;
-}
-
-void ctrl::PIDController::pubserver() {
-	server.PublishDescription();
 }
