@@ -17,7 +17,7 @@ struct PIDParameters {
 	float P = 40, I = 0.2, D=150;
 };
 
-class PIDController: public Controller {
+class PIDController: public Controller<float> {
 public:
 	PIDController(float outMin, float outMax);
 	

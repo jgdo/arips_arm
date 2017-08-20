@@ -10,12 +10,15 @@
 
 namespace ctrl {
 
+template<class T>
 class Controller {
 public:
+	typedef T ValueType;
+	
 	virtual ~Controller() {}
 	
 	virtual void reset() {}
-	virtual float control(float input, float setpoint) = 0;
+	virtual float control(ValueType input, ValueType setpoint) = 0;
 };
 
 };

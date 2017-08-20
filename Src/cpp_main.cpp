@@ -2,7 +2,7 @@
 #include "stm32f1xx_hal.h"
 #include <stdio.h>
 
-#include <arips_arm_msgs/control_raw_array.h>
+#include <arips_arm_msgs/control_state_array_stamped.h>
 #include <hw/L298.h>
 
 #include <ros.h>
@@ -20,8 +20,8 @@ extern ADC_HandleTypeDef hadc1;
 extern TIM_HandleTypeDef htim1;
 }
 
-arips_arm_msgs::control_raw_stamped msg;
-ros::Publisher chatter("control_raw", &msg);
+arips_arm_msgs::control_state_array_stamped msg;
+ros::Publisher chatter("control_state", &msg);
 
 int cpp_main() {
 	nh.initNode();
@@ -30,6 +30,7 @@ int cpp_main() {
 	// utl::ROSParameterStoreHandler psh;
 	
 	ctrl::PIDController pid(-1, 1);
+	msg.data.resize(1);
 	
 	auto handle = SysTickTimer::createTimer(10, [&]() {
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
@@ -44,11 +45,11 @@ int cpp_main() {
 		  hw::l298motor0.set(out);
 
 		  msg.stamp = nh.now();
-		  msg.adc_raw[0] = adc[0];
-		  msg.adc_raw[1] = adc[1];
-		  msg.adc[0] = adc[0] / 4096.0f;
-		  msg.adc[1] = adc[1] / 4096.0f;
-		  msg.out[0] = out;
+		  msg.data[0].input_raw = adc[1];
+		  msg.data[0].input_pos = adc[1] / 4096.0f;
+		  msg.data[0].setpoint_pos = setpoint;
+		  msg.data[0].output = out;
+		  
 		  chatter.publish(&msg);
 	  });
 	
