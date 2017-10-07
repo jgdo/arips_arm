@@ -18,6 +18,11 @@ public:
 	virtual ~Controller() {}
 	
 	virtual void reset() {}
+	
+	virtual void doBreak() {}
+	
+	virtual void doReleaseMotor() {}
+	
 	virtual float control(ValueType input, ValueType setpoint) = 0;
 };
 
