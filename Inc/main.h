@@ -76,7 +76,7 @@
 #define ADC_DMA_BUF_SIZE (ADC_CHANNELS_IN_USE * ADC_DMA_BUF_NUM_SAMPLES)
 extern uint32_t gAdcDMABuffer[ADC_DMA_BUF_SIZE];
 
-extern volatile uint32_t gAdcCurrentValue[ADC_CHANNELS_IN_USE];
+extern volatile float gAdcCurrentValue[ADC_CHANNELS_IN_USE];
 
 /* USER CODE END Private defines */
 

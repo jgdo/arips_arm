@@ -12,15 +12,34 @@
 #include <hw/ControllerHardware.h>
 #include <path/SingleTargetPathProvider.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
+#include <arips_arm_msgs/JointState.h>
 
 namespace path {
 
 class JointStateObserver {
 public:
-	inline ctrl::JointState getCurrentJointState() {
-		auto adc = hw::adc::getAll();
-		return ctrl::JointState { Vec2f(adc[1]/4096f, 0.0) }; // TODO: measure velocity
+	JointStateObserver(): mLastPos(hw::adc::getAll()[1]), mLastVel(0), mLastMs(hw::clock::getTimeMs()) {
 	}
+	
+	inline ctrl::JointState getCurrentJointState() {
+		auto adc = hw::adc::getAll()[1];
+		float pos = adc / 4096.0f;
+		
+		uint32_t now = hw::clock::getTimeMs();
+		uint32_t dt = now - mLastMs;
+		
+		if(dt > 5) {
+			mLastVel = (pos - mLastPos) / (dt * 0.001f);
+			mLastPos = pos;
+			mLastMs = now;
+		} 
+		
+		return ctrl::JointState { Vec2f(pos, mLastVel), adc };
+	}
+	
+private:	
+	float mLastPos, mLastVel;
+	uint32_t mLastMs;
 };
 
 class MotionManager {
@@ -35,7 +54,7 @@ public:
 	/**
 	 * @param[in] controller joint motor controller
 	 */
-	MotionManager(ctrl::Controller<Eigen::Vector2f>* controller);
+	MotionManager(ctrl::Controller<Eigen::Vector2f>* controller, hw::Actuator* actuator, JointStateObserver* jso);
 	~MotionManager();
 	
 	/**
@@ -43,7 +62,7 @@ public:
 	 * 
 	 * @param[in] dt delta time since last call
 	 */
-	void onControlTick(float dt);
+	arips_arm_msgs::JointState onControlTick();
 	
 	/**
 	 * Cancel current goal and set new single goal
@@ -51,17 +70,23 @@ public:
 	 * @param[in] point goal movement point
 	 */
 	void setNewSingleGoal(float position);
+	
+	inline JointStateObserver* getJointStateObserver() {
+		return mJointStateObserver;
+	}
 		
 private:
 	State mCurrentState = IDLE;
 	
-	JointStateObserver mJointStateObserver;
+	JointStateObserver* mJointStateObserver;
+	
+	hw::Actuator* mActuator;
 	
 	SingleTargetPathProvider mSingleTargetProvider;
 	
 	ctrl::Controller<Eigen::Vector2f>* mJointController;
 	
-	ros::Time mPathStartTime;
+	uint32_t mPathStartTimeMs = 0;
 };
 
 } /* namespace path */

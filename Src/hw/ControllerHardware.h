@@ -8,6 +8,8 @@
 #ifndef CONTROLLERHARDWARE_H_
 #define CONTROLLERHARDWARE_H_
 
+#include <stm32f1xx_hal.h>
+
 #include <cstddef>
 #include <array>
 
@@ -23,8 +25,8 @@ namespace adc {
 
 static constexpr size_t NUM_CHANNELS = ADC_CHANNELS_IN_USE;
 
-inline std::array<uint32_t, NUM_CHANNELS> getAll() {
-	std::array<uint32_t, NUM_CHANNELS> adc;
+inline std::array<float, NUM_CHANNELS> getAll() {
+	std::array<float, NUM_CHANNELS> adc;
 	__disable_irq();
 	for (size_t i = 0; i < NUM_CHANNELS; i++) {
 		adc[i] = gAdcCurrentValue[i];
@@ -48,6 +50,14 @@ inline int get(size_t channel) {
 } // namespace adc
 
 extern std::array<Actuator*, 1> allMotors;
+
+namespace clock {
+
+inline uint32_t getTimeMs() {
+	return HAL_GetTick();
+}
+
+} // namespace clock 
 
 } // namespace hw 
 

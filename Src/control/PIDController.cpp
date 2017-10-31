@@ -11,7 +11,7 @@
 
 DECL_PARAM_NAME(ctrl::PIDParameters, float, P, 50, 0, 100);
 DECL_PARAM_NAME(ctrl::PIDParameters, float, I, 0.3, 0, 4);
-DECL_PARAM_NAME(ctrl::PIDParameters, float, D, 150, 0, 500);
+DECL_PARAM_NAME(ctrl::PIDParameters, float, D, 1.5f, 0, 5);
 
 template<>
 struct UtlParamList<ctrl::PIDParameters> {
@@ -24,22 +24,19 @@ struct UtlParamList<ctrl::PIDParameters> {
 
 namespace ctrl {
 
-float PIDController::control(float input, float setpoint) {	
+float PIDController::control(ValueType input, ValueType setpoint) {	
 	server.getConfig(params);
 	
-	float err = setpoint-input;
+	float err = setpoint[0]-input[0];
 	
-	float d = last - input;
 	isum += err *params.I;
 
 	if(isum > 0.5)
 		isum = .0f;
 	else if(isum < -0.5)
 		isum = -0.5;
-
-	last = input;
 	
-	float out = err*params.P + isum + d * params.D;
+	float out = err*params.P + isum - input[1] * params.D;
 	
 	// anti-windup
 	if(out < outMin) {
@@ -74,5 +71,4 @@ ctrl::PIDController::PIDController(float outMin, float outMax): server("pid"), o
 
 void ctrl::PIDController::reset() {
 	isum = 0;
-	last = 0;
 }

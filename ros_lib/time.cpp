@@ -33,6 +33,7 @@
  */
 
 #include "ros/time.h"
+#include "ros.h"
 
 namespace ros
 {
@@ -65,4 +66,23 @@ namespace ros
     normalizeSecNSec(sec, nsec);
     return *this;
   }
+
+  Duration operator-(const Time& lhs, const Time& rhs) {
+  	Duration dur;
+		dur.sec = lhs.sec - rhs.sec;
+		
+		if(lhs.nsec >= rhs.nsec) {
+			dur.nsec = lhs.nsec - rhs.nsec;
+		} else {
+			dur.sec--;
+			dur.nsec = 1000 + lhs.nsec - rhs.nsec;
+		}
+  	
+    return dur;
+  }
+
+Time Time::now() {
+	return nh.now();
+}
+
 }

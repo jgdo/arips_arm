@@ -86,7 +86,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 /* USER CODE BEGIN 0 */
 
 uint32_t gAdcDMABuffer[ADC_DMA_BUF_SIZE];
-volatile uint32_t gAdcCurrentValue[ADC_CHANNELS_IN_USE];
+volatile float gAdcCurrentValue[ADC_CHANNELS_IN_USE];
 
 /* USER CODE END 0 */
 

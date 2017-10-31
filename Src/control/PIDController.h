@@ -12,29 +12,27 @@
 
 #include <utl/ParameterStore.h>
 
+#include <Eigen/Dense>
+
 namespace ctrl {
 struct PIDParameters {
-	float P = 40, I = 0.2, D=150;
+	float P = 40, I = 0.2, D=1.5f;
 };
 
-class PIDController: public Controller<float> {
+class PIDController: public Controller<Eigen::Vector2f> {
 public:
 	PIDController(float outMin, float outMax);
 	
 	virtual void reset() override;
 	
-	virtual float control(float input, float setpoint) override;
+	virtual float control(ValueType input, ValueType setpoint) override;
 	
 private:
 	utl::ParameterServer<PIDParameters> server;
 	
 	float outMin, outMax;
 	
-	
-	
-	float last = 0.5;
 	float isum = 0;
-	
 	
 	
 	PIDParameters params;
