@@ -64,9 +64,11 @@ namespace ros
       Time& operator -=(const Duration &rhs);
 
       static Time now();
+      
       static void setNow( Time & new_now);
   };
 
+  Duration operator-(const Time& lhs, const Time& rhs);
 }
 
 #endif

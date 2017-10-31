@@ -9,7 +9,10 @@
 
 namespace path {
 
-SingleTargetPathProvider::SingleTargetPathProvider(float defaultSetpoint) // :
+constexpr float SingleTargetPathProvider::V_MAX; /**< Maximum velocity [rad/s] */
+constexpr float SingleTargetPathProvider::A_MAX; /**< Maximum acceleration rate [rad/s²] */
+
+SingleTargetPathProvider::SingleTargetPathProvider() // :
     //	mDefaultSetpoint(defaultSetpoint), mTargetSetpoint(defaultSetpoint), mTimeFinished(float::now()) 
     {
 }

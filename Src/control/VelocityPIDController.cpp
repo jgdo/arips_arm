@@ -7,8 +7,9 @@
 
 #include <control/VelocityPIDController.h>
 
-DECL_PARAM_NAME(ctrl::VelocityPIDController::Parameters, float, P, 50, 0, 100);DECL_PARAM_NAME(ctrl::VelocityPIDController::Parameters, float, I, 0.2, 0, 4);
-DECL_PARAM_NAME(ctrl::VelocityPIDController::Parameters, float, D, 150, 0, 500);
+DECL_PARAM_NAME(ctrl::VelocityPIDController::Parameters, float, P, 50, 0, 100);
+DECL_PARAM_NAME(ctrl::VelocityPIDController::Parameters, float, I, 0.2, 0, 4);
+DECL_PARAM_NAME(ctrl::VelocityPIDController::Parameters, float, D, 1.5f, 0, 500);
 
 template<>
 struct UtlParamList<ctrl::VelocityPIDController::Parameters> {

@@ -19,7 +19,7 @@ namespace ctrl {
 class VelocityPIDController: public Controller<Eigen::Vector2f> {
 public:
 	struct Parameters {
-		float P = 40, I = 0.2, D = 150;
+		float P = 40, I = 0.2, D = 1.5f;
 	};
 
 	VelocityPIDController(float outMin, float outMax);

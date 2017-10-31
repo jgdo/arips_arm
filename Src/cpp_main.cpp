@@ -2,13 +2,14 @@
 #include "stm32f1xx_hal.h"
 #include <stdio.h>
 
-#include <arips_arm_msgs/control_state_array_stamped.h>
 #include <hw/L298.h>
 
 #include <ros.h>
 #include <utl/Timer.h>
 #include "hw/ControllerHardware.h"
-#include "control/PIDController.h"
+#include "control/VelocityPIDController.h"
+#include <control/PIDController.h>
+#include <path/RosMotionManager.h>
 
 using ros::nh;
 
@@ -20,21 +21,22 @@ extern ADC_HandleTypeDef hadc1;
 extern TIM_HandleTypeDef htim1;
 }
 
-arips_arm_msgs::control_state_array_stamped msg;
-ros::Publisher chatter("control_state", &msg);
-
 int cpp_main() {
 	nh.initNode();
-	nh.advertise(chatter);
 	
 	// utl::ROSParameterStoreHandler psh;
 	
-	ctrl::PIDController pid(-1, 1);
-	msg.data.resize(1);
+	ctrl::VelocityPIDController pid(-1, 1);
+	path::JointStateObserver jso;
+	
+	path::RosMotionManager motionMan(&pid, &hw::l298motor0, &jso);
 	
 	auto handle = SysTickTimer::createTimer(10, [&]() {
+		
+		
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 
+		/*
 		auto adc = hw::adc::getAll();
 
 		//float setpoint = utl::ParameterStore::get<float>(utl::PS_ID_SETPOINT);
@@ -43,14 +45,13 @@ int cpp_main() {
 
 		  float out = pid.control(adc[1] / 4096.0f, setpoint);
 		  hw::l298motor0.set(out);
-
-		  msg.stamp = nh.now();
-		  msg.data[0].input_raw = adc[1];
-		  msg.data[0].input_pos = adc[1] / 4096.0f;
-		  msg.data[0].setpoint_pos = setpoint;
-		  msg.data[0].output = out;
 		  
-		  chatter.publish(&msg);
+		  */
+		
+		motionMan.onControlTick();
+		
+		
+
 	  });
 	
 	while (1) {

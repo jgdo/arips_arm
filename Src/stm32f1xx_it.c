@@ -210,7 +210,7 @@ static void averageAndStoreAdcHalfSamples(size_t startIndex) {
 	}
 	
 	for (size_t channel = 0; channel < ADC_CHANNELS_IN_USE; channel++) {
-		gAdcCurrentValue[channel] = sum[channel] / (ADC_DMA_BUF_NUM_SAMPLES / 2);
+		gAdcCurrentValue[channel] = (float)sum[channel] / (float)(ADC_DMA_BUF_NUM_SAMPLES / 2);
 	}
 }
 
