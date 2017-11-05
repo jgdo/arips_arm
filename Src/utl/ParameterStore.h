@@ -131,6 +131,11 @@ struct ParamPack<First, Rest...> {
 		paramList.groups[0].id = 0;
 		paramList.groups[0].parent = 0;
 
+		paramList.bools.reserve(NUM_PARAMS);
+		paramList.ints.reserve(NUM_PARAMS);
+		paramList.doubles.reserve(NUM_PARAMS);
+		paramList.strs.reserve(NUM_PARAMS);
+		
 		paramList.bools.resize(0);
 		paramList.ints.resize(0);
 		paramList.doubles.resize(0);
