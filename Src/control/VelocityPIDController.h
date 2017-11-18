@@ -28,7 +28,7 @@ public:
 	virtual float control(ValueType input, ValueType setpoint) override;
 
 private:
-	utl::ParameterServer<Parameters> server;
+	// utl::ParameterServer<Parameters> server;
 
 	float outMin, outMax;
 	

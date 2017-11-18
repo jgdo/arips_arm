@@ -14,7 +14,7 @@ namespace ctrl {
 
 struct JointState {
 	Vec2f motionState; /**< current (estimated) joint motion state (position, velocity) in [rad, rad/s] */
-	uint32_t adc_raw;
+	float adc_raw;
 };
 
 } /* namespace ctrl */

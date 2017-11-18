@@ -23,7 +23,7 @@ struct UtlParamList<ctrl::VelocityPIDController::Parameters> {
 namespace ctrl {
 
 VelocityPIDController::VelocityPIDController(float outMin, float outMax) :
-		server("pid"), outMin(outMin), outMax(outMax) {
+		 /* server("pid"), */ outMin(outMin), outMax(outMax) {
 }
 
 void VelocityPIDController::reset() {
@@ -31,7 +31,7 @@ void VelocityPIDController::reset() {
 }
 
 float VelocityPIDController::control(ValueType input, ValueType setpoint) {
-	server.getConfig(params);
+	// server.getConfig(params);
 	
 	float err = setpoint[0] - input[0];
 	float derr = setpoint[1] - input[1];
