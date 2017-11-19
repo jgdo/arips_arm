@@ -78,6 +78,16 @@ public:
 	 */
 	void startFollowingTrajectory();
 	
+	/**
+	 * Cancel any movement goals and stop
+	 */
+	void stop();
+	
+	/**
+	 * Set state to idle and release motors
+	 */
+	void release();
+	
 	inline JointStateObserver* getJointStateObserver() {
 		return mJointStateObserver;
 	}

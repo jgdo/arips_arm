@@ -10,8 +10,9 @@
 
 #include "MotionManager.h"
 
-#include <arips_arm_msgs/joint_setpoint.h>
+#include <arips_arm_msgs/MotionCommand.h>
 #include <arips_arm_msgs/MotionState.h>
+#include <arips_arm_msgs/TrajectoryBufferCommand.h>
 
 namespace path {
 
@@ -21,14 +22,19 @@ public:
 	
 	void onControlTick();
 	
+	
+	
 private:
 	MotionManager mMotionManager;
-	ros::Subscriber<arips_arm_msgs::joint_setpoint, RosMotionManager> mSingleGoalSub;
+	ros::Subscriber<arips_arm_msgs::MotionCommand, RosMotionManager> mMotionCmdSub;
+	ros::Subscriber<arips_arm_msgs::TrajectoryBufferCommand, RosMotionManager> mTrajBuffSub;
 	
 	arips_arm_msgs::MotionState mMotionStateMsg;
 	ros::Publisher mMotionStatePub;
 	
-	void onSingleGoalCb(const arips_arm_msgs::joint_setpoint& msg);
+	void onMotionCommandCb(const arips_arm_msgs::MotionCommand& msg);
+	
+	void onTrajectoryBuffCb(const arips_arm_msgs::TrajectoryBufferCommand& msg);
 };
 
 } /* namespace path */

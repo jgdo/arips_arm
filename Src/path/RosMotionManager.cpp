@@ -12,10 +12,11 @@ namespace path {
 
 RosMotionManager::RosMotionManager(ctrl::Controller<Eigen::Vector2f>* controller, hw::Actuator* actuator, JointStateObserver* jso):
   mMotionManager(controller, actuator, jso),
-	mSingleGoalSub ("movement_goal", &RosMotionManager::onSingleGoalCb, this),
+	mMotionCmdSub ("movement_goal", &RosMotionManager::onMotionCommandCb, this),
+	mTrajBuffSub("motion_command", &RosMotionManager::onTrajectoryBuffCb, this),
 	mMotionStatePub("motion_state", &mMotionStateMsg) {
 	
-	ros::nh.subscribe(mSingleGoalSub);
+	ros::nh.subscribe(mMotionCmdSub);
 	ros::nh.advertise(mMotionStatePub);
 }
 
@@ -30,10 +31,23 @@ void RosMotionManager::onControlTick() {
 	mMotionStatePub.publish(&mMotionStateMsg);
 }
 
-void RosMotionManager::onSingleGoalCb(const arips_arm_msgs::joint_setpoint& msg) {
-	mMotionManager.setNewSingleGoal(msg.position);
+void RosMotionManager::onMotionCommandCb(const arips_arm_msgs::MotionCommand& msg) {
+	using arips_arm_msgs::MotionCommand;
 	
-	
+	if(msg.command == MotionCommand::CMD_SINGLE_TARGET) {
+		mMotionManager.setNewSingleGoal(msg.st_position);
+	} else if(msg.command == MotionCommand::CMD_START_TRAJECTORY) {
+		mMotionManager.startFollowingTrajectory();
+	} else if(msg.command == MotionCommand::CMD_STOP) {
+		mMotionManager.stop();
+	} else if(msg.command == MotionCommand::CMD_RELEASE) {
+		mMotionManager.release();
+	}
 }
 
+void RosMotionManager::onTrajectoryBuffCb(const arips_arm_msgs::TrajectoryBufferCommand& msg) {
+}
+
+
 } /* namespace path */
+
