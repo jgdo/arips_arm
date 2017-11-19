@@ -13,6 +13,7 @@
 #include <path/SingleTargetPathProvider.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <arips_arm_msgs/JointState.h>
+#include <path/TrajectoryPathBuffer.h>
 
 namespace path {
 
@@ -45,10 +46,11 @@ private:
 class MotionManager {
 public:
 	enum State {
-		IDLE, // motors are turned off
+		IDLE = 0, // motors are turned off
 		BREAK, // motors are short-cut
 		HOLD, // motors should hold position
 		SINGLE_GOAL, // moving to a final goal
+		TRAJECTORY, // trajectory (setpoint sequence)
 	};
 	
 	/**
@@ -71,10 +73,27 @@ public:
 	 */
 	void setNewSingleGoal(float position);
 	
+	/**
+	 * Start following trajectory in trajectory buffer
+	 */
+	void startFollowingTrajectory();
+	
 	inline JointStateObserver* getJointStateObserver() {
 		return mJointStateObserver;
 	}
-		
+	
+	inline TrajectoryPathBuffer& getTrajectoryBuffer() {
+		return mTrajectoryPathBuffer;
+	}
+	
+	inline State getState() const {
+		return mCurrentState;
+	}
+	
+	inline uint32_t getControlCycleCount() const {
+		return mControlCycleCount;
+	}
+	
 private:
 	State mCurrentState = IDLE;
 	
@@ -83,10 +102,14 @@ private:
 	hw::Actuator* mActuator;
 	
 	SingleTargetPathProvider mSingleTargetProvider;
+	TrajectoryPathBuffer mTrajectoryPathBuffer;
 	
 	ctrl::Controller<Eigen::Vector2f>* mJointController;
 	
 	uint32_t mPathStartTimeMs = 0;
+	uint32_t mControlCycleCount = 0;
+	
+	void checkAndSetPWM(arips_arm_msgs::JointState& state);
 };
 
 } /* namespace path */

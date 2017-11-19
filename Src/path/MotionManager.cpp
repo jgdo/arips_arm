@@ -8,6 +8,7 @@
 #include <path/MotionManager.h>
 
 #include <hw/ControllerHardware.h>
+#include <hw/ArmConfig.h>
 
 namespace path {
 
@@ -24,8 +25,15 @@ MotionManager::~MotionManager() {
 
 void MotionManager::setNewSingleGoal(float position) {
 	mCurrentState = SINGLE_GOAL;
+	mControlCycleCount = 0;
 	mPathStartTimeMs = hw::clock::getTimeMs();
 	mSingleTargetProvider.setTarget(0.0, position, mJointStateObserver->getCurrentJointState().motionState);
+}
+
+void MotionManager::startFollowingTrajectory() {
+	mCurrentState = TRAJECTORY;
+	mControlCycleCount = 0;
+	mPathStartTimeMs = hw::clock::getTimeMs();
 }
 
 arips_arm_msgs::JointState MotionManager::onControlTick() {
@@ -51,20 +59,52 @@ arips_arm_msgs::JointState MotionManager::onControlTick() {
 		res.pwm = mJointController->control(jointState.motionState, Vec2f(jointState.motionState(0), 0.0f));
 		res.setpoint_pos = jointState.motionState[0];
 		res.setpoint_vel = jointState.motionState[1];
-		mActuator->set(res.pwm);
+		checkAndSetPWM(res);
 		break;
 		
 	case SINGLE_GOAL: { // moving to a final goal
+		mControlCycleCount++;
 		Vec2f goal = mSingleTargetProvider.getSetpoint(dtStart, jointState.motionState);
 		res.pwm = mJointController->control(jointState.motionState, goal);
 		res.setpoint_pos = goal[0];
 		res.setpoint_vel = goal[1];
-		mActuator->set(res.pwm);
+		checkAndSetPWM(res);
 	}
+		break;
+		
+	case TRAJECTORY:
+		Vec2f goal = jointState.motionState;
+		TrajectoryPathBuffer::PointState ps = mTrajectoryPathBuffer.getNextSetpoint(jointState.motionState, &goal);
+		if(ps == TrajectoryPathBuffer::VALID) {
+			mControlCycleCount++;
+		} else if(ps == TrajectoryPathBuffer::EMPTY) {
+			// if trajectory buffer is empty, hold position
+			goal[1] = 0; 
+		} else if(ps == TrajectoryPathBuffer::FINISHED) {
+			// if trajectory finished, hold position
+			goal[1] = 0;
+			mCurrentState = HOLD;
+		}
+		
+		res.pwm = mJointController->control(jointState.motionState, goal);
+		res.setpoint_pos = goal[0];
+		res.setpoint_vel = goal[1];
+		checkAndSetPWM(res);
 		break;
 	}
 	
 	return res;
 }
 
+void MotionManager::checkAndSetPWM(arips_arm_msgs::JointState& state) {
+	if(state.position + state.velocity * ArmConfig::CONTROL_PERIOD_MS <= ArmConfig::JOINT_LIMIT_MIN) {
+		state.pwm = 0;
+		mActuator->stop();
+	} else {
+		mActuator->set(state.pwm);
+	}
+}
+
+
 } /* namespace path */
+

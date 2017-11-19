@@ -13,17 +13,21 @@ namespace path {
 RosMotionManager::RosMotionManager(ctrl::Controller<Eigen::Vector2f>* controller, hw::Actuator* actuator, JointStateObserver* jso):
   mMotionManager(controller, actuator, jso),
 	mSingleGoalSub ("movement_goal", &RosMotionManager::onSingleGoalCb, this),
-	mControlStatePub("control_state", &mJointStatesMsg) {
+	mMotionStatePub("motion_state", &mMotionStateMsg) {
 	
 	ros::nh.subscribe(mSingleGoalSub);
-	ros::nh.advertise(mControlStatePub);
+	ros::nh.advertise(mMotionStatePub);
 }
 
 void RosMotionManager::onControlTick() {
-	mJointStatesMsg.stamp = ros::Time::now();
-	mJointStatesMsg.state[0] = mMotionManager.onControlTick();
-  
-	mControlStatePub.publish(&mJointStatesMsg);
+	mMotionStateMsg.stamp = ros::Time::now();
+	mMotionStateMsg.mode = mMotionManager.getState();
+	mMotionStateMsg.jointStates[0] = mMotionManager.onControlTick();
+	mMotionStateMsg.trajState.bufferCapacity = TrajectoryPathBuffer::TRAJECTORY_BUFFER_CAPACITY;
+	mMotionStateMsg.trajState.controlCycleCount = mMotionManager.getControlCycleCount();
+	mMotionStateMsg.trajState.numPointsInBuffer = mMotionManager.getTrajectoryBuffer().getCurrentBufferSize();
+	
+	mMotionStatePub.publish(&mMotionStateMsg);
 }
 
 void RosMotionManager::onSingleGoalCb(const arips_arm_msgs::joint_setpoint& msg) {

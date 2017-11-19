@@ -67,22 +67,13 @@ namespace ros
     return *this;
   }
 
-  Duration operator-(const Time& lhs, const Time& rhs) {
-  	Duration dur;
-		dur.sec = lhs.sec - rhs.sec;
-		
-		if(lhs.nsec >= rhs.nsec) {
-			dur.nsec = lhs.nsec - rhs.nsec;
-		} else {
-			dur.sec--;
-			dur.nsec = 1000 + lhs.nsec - rhs.nsec;
-		}
-  	
-    return dur;
+  Time operator-(const Time& lhs, const Time& rhs) {
+    Time res(lhs.sec - rhs.sec, lhs.nsec - rhs.nsec);
+    normalizeSecNSec(res.sec, res.nsec);
+    return res;
   }
 
-Time Time::now() {
-	return nh.now();
-}
-
+  Time Time::now() {
+    return nh.now();
+  }
 }

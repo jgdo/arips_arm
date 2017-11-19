@@ -15,6 +15,7 @@ struct Actuator {
 	virtual ~Actuator() {}
 	
 	virtual void set(float value) = 0;
+	virtual void stop() = 0;
 	virtual const char* name() const = 0;
 };
 

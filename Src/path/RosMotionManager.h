@@ -11,7 +11,7 @@
 #include "MotionManager.h"
 
 #include <arips_arm_msgs/joint_setpoint.h>
-#include <arips_arm_msgs/JointStates.h>
+#include <arips_arm_msgs/MotionState.h>
 
 namespace path {
 
@@ -25,8 +25,8 @@ private:
 	MotionManager mMotionManager;
 	ros::Subscriber<arips_arm_msgs::joint_setpoint, RosMotionManager> mSingleGoalSub;
 	
-	arips_arm_msgs::JointStates mJointStatesMsg;
-	ros::Publisher mControlStatePub;
+	arips_arm_msgs::MotionState mMotionStateMsg;
+	ros::Publisher mMotionStatePub;
 	
 	void onSingleGoalCb(const arips_arm_msgs::joint_setpoint& msg);
 };
