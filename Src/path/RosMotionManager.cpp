@@ -12,8 +12,8 @@ namespace path {
 
 RosMotionManager::RosMotionManager(ctrl::Controller<Eigen::Vector2f>* controller, hw::Actuator* actuator, JointStateObserver* jso):
   mMotionManager(controller, actuator, jso),
-	mMotionCmdSub ("movement_goal", &RosMotionManager::onMotionCommandCb, this),
-	mTrajBuffSub("motion_command", &RosMotionManager::onTrajectoryBuffCb, this),
+	mMotionCmdSub ("motion_command", &RosMotionManager::onMotionCommandCb, this),
+	mTrajBuffSub("traj_buffer_command", &RosMotionManager::onTrajectoryBuffCb, this),
 	mMotionStatePub("motion_state", &mMotionStateMsg) {
 	
 	ros::nh.subscribe(mMotionCmdSub);
@@ -46,6 +46,29 @@ void RosMotionManager::onMotionCommandCb(const arips_arm_msgs::MotionCommand& ms
 }
 
 void RosMotionManager::onTrajectoryBuffCb(const arips_arm_msgs::TrajectoryBufferCommand& msg) {
+	TrajectoryPathBuffer& buf = mMotionManager.getTrajectoryBuffer();
+	if(msg.start_index > mMotionManager.getControlCycleCount()) {
+		return; // error: skipped points
+	} else {
+		size_t start_index = mMotionManager.getControlCycleCount() - msg.start_index;
+		for(size_t i = start_index; i < std::min<size_t>(msg.size, msg.traj_points.size()); i++) {
+			::path::TrajectoryPoint point;
+			auto const& origPoint = msg.traj_points.at(i);
+			static_assert(ArmConfig::NUM_JOINTS == std::tuple_size<arips_arm_msgs::TrajectoryPoint::_positions_type>::value);
+			static_assert(ArmConfig::NUM_JOINTS == std::tuple_size<arips_arm_msgs::TrajectoryPoint::_velocities_type>::value);
+			static_assert(ArmConfig::NUM_JOINTS == std::tuple_size<arips_arm_msgs::TrajectoryPoint::_accelerations_type>::value);
+			
+			for(size_t j = 0; j < ArmConfig::NUM_JOINTS; j++) {
+				point.joints.at(j).position = origPoint.positions.at(j);
+				point.joints.at(j).velocity = origPoint.velocities.at(j);
+				point.joints.at(j).acceleration = origPoint.accelerations.at(j);
+			}
+			
+			if(!buf.addTrajectoryPoint(point)) {
+				break; // buffer is full
+			}
+		}
+	}
 }
 
 
