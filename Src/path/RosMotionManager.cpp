@@ -16,8 +16,9 @@ RosMotionManager::RosMotionManager(ctrl::Controller<Eigen::Vector2f>* controller
 	mTrajBuffSub("traj_buffer_command", &RosMotionManager::onTrajectoryBuffCb, this),
 	mMotionStatePub("motion_state", &mMotionStateMsg) {
 	
-	ros::nh.subscribe(mMotionCmdSub);
 	ros::nh.advertise(mMotionStatePub);
+	ros::nh.subscribe(mMotionCmdSub);
+	ros::nh.subscribe(mTrajBuffSub);
 }
 
 void RosMotionManager::onControlTick() {
@@ -50,7 +51,15 @@ void RosMotionManager::onTrajectoryBuffCb(const arips_arm_msgs::TrajectoryBuffer
 	if(msg.start_index > mMotionManager.getControlCycleCount()) {
 		return; // error: skipped points
 	} else {
-		size_t start_index = mMotionManager.getControlCycleCount() - msg.start_index;
+		size_t start_index = 0;
+		
+		if(msg.start_index == 0) {
+			start_index = 0;
+			buf.newTrajectory(msg.size);
+		} else {
+			start_index = mMotionManager.getControlCycleCount() - msg.start_index;
+		}
+		
 		for(size_t i = start_index; i < std::min<size_t>(msg.size, msg.traj_points.size()); i++) {
 			::path::TrajectoryPoint point;
 			auto const& origPoint = msg.traj_points.at(i);

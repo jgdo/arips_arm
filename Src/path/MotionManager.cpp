@@ -91,7 +91,7 @@ arips_arm_msgs::JointState MotionManager::onControlTick() {
 		} else if (ps == TrajectoryPathBuffer::FINISHED) {
 			// if trajectory finished, hold position
 			goal[1] = 0;
-			mCurrentState = HOLD;
+			mCurrentState = BREAK;
 		}
 		
 		res.pwm = mJointController->control(jointState.motionState, goal);
