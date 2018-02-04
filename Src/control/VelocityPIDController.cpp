@@ -7,6 +7,7 @@
 
 #include <control/VelocityPIDController.h>
 
+/*
 DECL_PARAM_NAME(ctrl::VelocityPIDController::Parameters, float, P, 50, 0, 100);
 DECL_PARAM_NAME(ctrl::VelocityPIDController::Parameters, float, I, 0.2, 0, 4);
 DECL_PARAM_NAME(ctrl::VelocityPIDController::Parameters, float, D, 1.5f, 0, 500);
@@ -20,10 +21,12 @@ struct UtlParamList<ctrl::VelocityPIDController::Parameters> {
 	> List;
 };
 
+*/
+
 namespace ctrl {
 
 VelocityPIDController::VelocityPIDController(float outMin, float outMax) :
-		 /* server("pid"), */ outMin(outMin), outMax(outMax) {
+		params("velocity_pid_params"), outMin(outMin), outMax(outMax) {
 }
 
 void VelocityPIDController::reset() {
@@ -36,14 +39,14 @@ float VelocityPIDController::control(ValueType input, ValueType setpoint) {
 	float err = setpoint[0] - input[0];
 	float derr = setpoint[1] - input[1];
 	
-	isum += err * params.I;
+	isum += err * params.I.mValue;
 	
 	if (isum > 0.5)
 		isum = .0f;
 	else if (isum < -0.5)
 		isum = -0.5;
 	
-	float out = err * params.P + derr * params.D + isum;
+	float out = err * params.P.mValue + derr * params.D.mValue + isum;
 	
 	// anti-windup
 	if (out < outMin) {

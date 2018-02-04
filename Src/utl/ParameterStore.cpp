@@ -5,6 +5,7 @@
  *      Author: jgdo
  */
 
+#if 0
 #include "ParameterStore.h"
 
 namespace utl {
@@ -46,3 +47,5 @@ void addParamToConfig<double>(const char* name, double value, dynamic_reconfigur
 }
 
 }
+
+#endif

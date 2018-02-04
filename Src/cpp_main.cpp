@@ -10,6 +10,7 @@
 #include "control/VelocityPIDController.h"
 #include <control/PIDController.h>
 #include <path/RosMotionManager.h>
+#include <utl/ParameterServer.h>
 
 using ros::nh;
 
@@ -23,12 +24,10 @@ extern TIM_HandleTypeDef htim1;
 
 int cpp_main() {
 	nh.initNode();
-	
-	// utl::ROSParameterStoreHandler psh;
+	utl::ParameterServer::init();
 	
 	ctrl::VelocityPIDController pid(-1, 1);
 	path::JointStateObserver jso;
-	
 	path::RosMotionManager motionMan(&pid, &hw::l298motor0, &jso);
 	
 	auto handle = SysTickTimer::createTimer(10, [&]() {

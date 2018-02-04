@@ -10,13 +10,22 @@
 
 #include <control/Controller.h>
 
-#include <utl/ParameterStore.h>
+#include <utl/ParameterServer.h>
 
 #include <Eigen/Dense>
 
 namespace ctrl {
-struct PIDParameters {
-	float P = 40, I = 0.2, D=1.5f;
+
+struct PIDParameters: public utl::ParameterGroup {	
+	PIDParameters(const char* name):
+		utl::ParameterGroup(name),
+		P("p", this, 40.0f),
+		I("i", this, 0.2f),
+		D("d", this, 1.5f)
+	{
+	}
+	
+	utl::FloatParam P, I, D;
 };
 
 class PIDController: public Controller<Eigen::Vector2f> {
@@ -27,15 +36,12 @@ public:
 	
 	virtual float control(ValueType input, ValueType setpoint) override;
 	
-private:
-	utl::ParameterServer<PIDParameters> server;
+private:	
+	PIDParameters params;
 	
 	float outMin, outMax;
 	
 	float isum = 0;
-	
-	
-	PIDParameters params;
 };
 
 } /* namespace ctrl */

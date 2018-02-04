@@ -41,6 +41,8 @@
 
  */
 
+#if 0
+
 #ifndef __UTL_PARAMETER_STORE_H__
 #define __UTL_PARAMETER_STORE_H__
 
@@ -428,3 +430,5 @@ private:
 } // namespace utl
 
 #endif // __UTL_PARAMETER_STORE_H__
+
+#endif

@@ -9,6 +9,7 @@
 
 #include <control/PIDController.h>
 
+/*
 DECL_PARAM_NAME(ctrl::PIDParameters, float, P, 50, 0, 100);
 DECL_PARAM_NAME(ctrl::PIDParameters, float, I, 0.3, 0, 4);
 DECL_PARAM_NAME(ctrl::PIDParameters, float, D, 1.5f, 0, 5);
@@ -22,21 +23,23 @@ struct UtlParamList<ctrl::PIDParameters> {
     > List;
 };
 
+*/
+
 namespace ctrl {
 
 float PIDController::control(ValueType input, ValueType setpoint) {	
-	server.getConfig(params);
+	// server.getConfig(params);
 	
 	float err = setpoint[0]-input[0];
 	
-	isum += err *params.I;
+	isum += err *params.I.mValue;
 
 	if(isum > 0.5)
 		isum = .0f;
 	else if(isum < -0.5)
 		isum = -0.5;
 	
-	float out = err*params.P + isum - input[1] * params.D;
+	float out = err*params.P.mValue + isum - input[1] * params.D.mValue;
 	
 	// anti-windup
 	if(out < outMin) {
@@ -66,7 +69,8 @@ float PIDController::control(ValueType input, ValueType setpoint) {
 
 } /* namespace ctrl */
 
-ctrl::PIDController::PIDController(float outMin, float outMax): server("pid"), outMin(outMin), outMax(outMax) {
+ctrl::PIDController::PIDController(float outMin, float outMax): params("pid_params"), outMin(outMin), outMax(outMax)
+{
 }
 
 void ctrl::PIDController::reset() {
