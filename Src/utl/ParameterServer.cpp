@@ -24,6 +24,8 @@ ParameterGroup::ParameterGroup(const char* name):
 }
 
 void ParameterGroup::registerParameter(Parameter* param) {
+	mNumParams++;
+	
 	param->mNextParam = nullptr; // just to be sure
 	
 	if(mLastParameter) {
@@ -37,6 +39,8 @@ void ParameterGroup::registerParameter(Parameter* param) {
 }
 
 void ParameterServer::registerParameterGroup(ParameterGroup* group) {
+	sNumGroups++;
+	
 	group->mNextGroup = nullptr; // just to be sure
 	
 	if(sAllGroupsLast) {
