@@ -10,14 +10,18 @@
 
 #include <utl/vecdef.h>
 
-namespace ctrl {
+#include "ArmConfig.h"
+
+namespace robot {
 
 struct JointState {
 	Vec2f motionState; /**< current (estimated) joint motion state (position, velocity) in [rad, rad/s] */
-	float adc_raw;
+	float rawPosition; /**< raw position value, usually from corresponding adc, unit undefined */
 };
 
-} /* namespace ctrl */
+typedef std::array<Vec2f, ArmConfig::NUM_JOINTS> JointMotionStates;
+
+} /* namespace robot */
 
 
 

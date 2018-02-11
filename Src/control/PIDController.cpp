@@ -27,7 +27,7 @@ struct UtlParamList<ctrl::PIDParameters> {
 
 namespace ctrl {
 
-float PIDController::control(ValueType input, ValueType setpoint) {	
+float PIDController::computeControl(ValueType input, ValueType setpoint) {	
 	// server.getConfig(params);
 	
 	float err = setpoint[0]-input[0];

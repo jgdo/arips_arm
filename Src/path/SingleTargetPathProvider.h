@@ -8,7 +8,6 @@
 #ifndef PATH_SINGLETARGETPATHPROVIDER_H_
 #define PATH_SINGLETARGETPATHPROVIDER_H_
 
-#include <control/JointState.h>
 #include <utl/vecdef.h>
 #include <ros.h>
 

@@ -10,6 +10,8 @@
 
 #include "MotionManager.h"
 
+#include <ros.h>
+
 #include <arips_arm_msgs/MotionCommand.h>
 #include <arips_arm_msgs/MotionState.h>
 #include <arips_arm_msgs/TrajectoryBufferCommand.h>
@@ -18,11 +20,9 @@ namespace path {
 
 class RosMotionManager {
 public:
-	RosMotionManager(ctrl::Controller<Eigen::Vector2f>* controller, hw::Actuator* actuator, JointStateObserver* jso);
+	RosMotionManager(robot::RobotArmController* controller, robot::RobotArmHardware* arm);
 	
 	void onControlTick();
-	
-	
 	
 private:
 	MotionManager mMotionManager;

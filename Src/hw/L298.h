@@ -21,7 +21,7 @@ public:
 	
 	virtual ~L298Motor() {}
 	
-	virtual void set(float value) override {
+	virtual void apply(float value) override {
 		if (value > 0.1) {
 				HAL_GPIO_WritePin(mIn1Port, mIn1Pin, GPIO_PIN_SET);
 				HAL_GPIO_WritePin(mIn2Port, mIn2Pin, GPIO_PIN_RESET);
@@ -37,11 +37,17 @@ public:
 			}
 	}
 	
-	virtual void stop() override {
+	virtual void doBreak() override {
 		HAL_GPIO_WritePin(mIn1Port, mIn1Pin, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(mIn1Port, mIn2Pin, GPIO_PIN_SET);
 		mCCR = mTimer->ARR-1;
 	}
+	
+	virtual void release() override {
+			HAL_GPIO_WritePin(mIn1Port, mIn1Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(mIn1Port, mIn2Pin, GPIO_PIN_RESET);
+			mCCR = 0;
+		}
 	
 	virtual const char* name() const override {
 		return mName;
@@ -61,6 +67,10 @@ private:
 };
 
 extern L298Motor l298motor0; 
+extern L298Motor l298motor1; 
+extern L298Motor l298motor2; 
+extern L298Motor l298motor3; 
+extern L298Motor l298motor4; 
 
 } // namespace hw 
 

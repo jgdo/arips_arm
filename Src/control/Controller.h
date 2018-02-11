@@ -19,11 +19,7 @@ public:
 	
 	virtual void reset() {}
 	
-	virtual void doBreak() {}
-	
-	virtual void doReleaseMotor() {}
-	
-	virtual float control(ValueType input, ValueType setpoint) = 0;
+	virtual float computeControl(ValueType input, ValueType setpoint) = 0;
 };
 
 };

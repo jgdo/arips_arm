@@ -8,22 +8,14 @@
 #ifndef PATH_TRAJECTORYPATHBUFFER_H_
 #define PATH_TRAJECTORYPATHBUFFER_H_
 
-#include <hw/ArmConfig.h>
+#include <robot/JointState.h>
 #include <utl/vecdef.h>
 
 #include <array>
 
+#include <arips_arm_msgs/TrajectoryPoint.h>
+
 namespace path {
-
-struct JointPoint {
-	float position;
-	float velocity;
-	float acceleration;
-};
-
-struct TrajectoryPoint {
-	std::array<JointPoint, ArmConfig::NUM_JOINTS> joints;
-};
 
 class TrajectoryPathBuffer {
 public:
@@ -51,16 +43,15 @@ public:
 	 * @param point point to add to trajectory
 	 * @return True if point could be added, false if trajectory buffer is full.
 	 */
-	bool addTrajectoryPoint(const TrajectoryPoint& point);
+	bool addTrajectoryPoint(const arips_arm_msgs::TrajectoryPoint& point);
 		
 	/**
 	 * Get next trajectory setpoint.
 	 * 
-	 * @param currentState current joint state (position, velocity)
 	 * @param point where to store the output
 	 * @return point state
 	 */
-	PointState getNextSetpoint(Vec2f currentState, Vec2f* point);
+	PointState getNextSetpoint(robot::JointMotionStates* setpoint);
 	
 	/**
 	 * @return remaining trajectory buffer capacity
@@ -81,7 +72,7 @@ public:
 	}
 	
 private:
-	std::array<TrajectoryPoint, TRAJECTORY_BUFFER_CAPACITY> mTrajectoryBuffer;
+	std::array<arips_arm_msgs::TrajectoryPoint, TRAJECTORY_BUFFER_CAPACITY> mTrajectoryBuffer;
 	size_t mBufferStart = 0; // index to next trajectory point to read
 	size_t mBufferEnd = 0; // index after last trajectory point (next trajectory point to write)
 	

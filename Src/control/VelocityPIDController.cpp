@@ -33,7 +33,7 @@ void VelocityPIDController::reset() {
 	isum = 0;
 }
 
-float VelocityPIDController::control(ValueType input, ValueType setpoint) {
+float VelocityPIDController::computeControl(ValueType input, ValueType setpoint) {
 	// server.getConfig(params);
 	
 	float err = setpoint[0] - input[0];

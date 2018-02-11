@@ -34,7 +34,7 @@ public:
 	
 	virtual void reset() override;
 	
-	virtual float control(ValueType input, ValueType setpoint) override;
+	virtual float computeControl(ValueType input, ValueType setpoint) override;
 	
 private:	
 	PIDParameters params;

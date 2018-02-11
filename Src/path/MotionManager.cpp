@@ -8,13 +8,13 @@
 #include <path/MotionManager.h>
 
 #include <hw/ControllerHardware.h>
-#include <hw/ArmConfig.h>
+
+using namespace robot::ArmConfig;
 
 namespace path {
 
-MotionManager::MotionManager(ctrl::Controller<Eigen::Vector2f>* controller, hw::Actuator* actuator,
-		JointStateObserver* jso) :
-		mJointStateObserver(jso), mActuator(actuator), mJointController(controller) {
+MotionManager::MotionManager(robot::RobotArmController* controller, robot::RobotArmHardware* arm) :
+		mJointController(controller), mArmHardware(arm) {
 }
 
 MotionManager::~MotionManager() {
@@ -22,10 +22,12 @@ MotionManager::~MotionManager() {
 }
 
 void MotionManager::setNewSingleGoal(float position) {
+	// TODO: remove completely?
 	mCurrentState = SINGLE_GOAL;
 	mControlCycleCount = 0;
 	mPathStartTimeMs = hw::clock::getTimeMs();
-	mSingleTargetProvider.setTarget(0.0, position, mJointStateObserver->getCurrentJointState().motionState);
+	// mSingleTargetProvider.setTarget(0.0, position, mJointStateObserver->getCurrentJointState().motionState);
+	mArmHardware->breakMotors();
 }
 
 void MotionManager::startFollowingTrajectory() {
@@ -44,75 +46,101 @@ void MotionManager::release() {
 	mControlCycleCount = 0;
 }
 
-arips_arm_msgs::JointState MotionManager::onControlTick() {
-	arips_arm_msgs::JointState res;
+void MotionManager::onControlTick(JointStatesMsg& jointStates) {
+	mArmHardware->readJointStates();
+	const robot::JointStates& lastJointStates = mArmHardware->getJointStates();
 	
-	auto jointState = mJointStateObserver->getCurrentJointState();
 	float dtStart = (hw::clock::getTimeMs() - mPathStartTimeMs) * 0.001F;
 	
-	res.adc_raw = jointState.adc_raw;
-	res.position = jointState.motionState[0];
-	res.velocity = jointState.motionState[1];
+	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+		jointStates.at(i).adc_raw = lastJointStates.at(i).rawPosition;
+		jointStates.at(i).position = lastJointStates.at(i).motionState[0];
+		jointStates.at(i).velocity = lastJointStates.at(i).motionState[1];
+	}
+	
+	robot::JointMotionStates controlInput, controlSetpoint;
+	
+	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+		controlInput.at(i) = lastJointStates.at(i).motionState;
+	}
 	
 	switch (mCurrentState) {
 	case IDLE: // motors are turned off
-		mActuator->set(0);
+		mArmHardware->releaseMotors();
 		break;
 		
 	case BREAK: // motors are short-cut
-		mActuator->stop();
+		mArmHardware->breakMotors();
 		break;
 		
-	case HOLD: // motors should hold position
-		res.pwm = mJointController->control(jointState.motionState, Vec2f(jointState.motionState(0), 0.0f));
-		res.setpoint_pos = jointState.motionState[0];
-		res.setpoint_vel = jointState.motionState[1];
-		checkAndSetPWM(res);
-		break;
-		
-	case SINGLE_GOAL: { // moving to a final goal
+	case SINGLE_GOAL:
 		mControlCycleCount++;
-		Vec2f goal = mSingleTargetProvider.getSetpoint(dtStart, jointState.motionState);
-		res.pwm = mJointController->control(jointState.motionState, goal);
-		res.setpoint_pos = goal[0];
-		res.setpoint_vel = goal[1];
-		checkAndSetPWM(res);
+		// fallthrough
+		// TODO: consider removing completely
+	case HOLD: { // motors should hold position
+		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+			controlSetpoint.at(i) = Vec2f::Zero();
+		}
+		
+		robot::JointPowers outputs = mJointController->computeControl(controlInput, controlSetpoint);
+		
+		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+			jointStates.at(i).setpoint_pos = lastJointStates.at(i).motionState[0];
+			jointStates.at(i).setpoint_vel = lastJointStates.at(i).motionState[1];
+		}
+		
+		checkAndSetPWM(jointStates, outputs);
 	}
 		break;
 		
-	case TRAJECTORY:
-		Vec2f goal = jointState.motionState;
-		TrajectoryPathBuffer::PointState ps = mTrajectoryPathBuffer.getNextSetpoint(jointState.motionState, &goal);
+		/*
+		 case SINGLE_GOAL: { // moving to a final goal
+		 mControlCycleCount++;
+		 //Vec2f goal = mSingleTargetProvider.getSetpoint(dtStart, jointState.motionState);
+		 //res.pwm = mJointController->control(jointState.motionState, goal);
+		 //res.setpoint_pos = goal[0];
+		 //res.setpoint_vel = goal[1];
+		 checkAndSetPWM(jointStates);
+		 }
+		 break;
+		 
+		 */
+
+	case TRAJECTORY: {
+		TrajectoryPathBuffer::PointState ps = mTrajectoryPathBuffer.getNextSetpoint(&controlSetpoint);
 		if (ps == TrajectoryPathBuffer::VALID) {
 			mControlCycleCount++;
 		} else if (ps == TrajectoryPathBuffer::EMPTY) {
 			// if trajectory buffer is empty, hold position
-			goal[1] = 0;
+			for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+				controlSetpoint.at(i) = Vec2f(lastJointStates.at(i).motionState[0], 0);
+			}
 		} else if (ps == TrajectoryPathBuffer::FINISHED) {
 			// if trajectory finished, hold position
-			goal[1] = 0;
+			for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+				controlSetpoint.at(i) = Vec2f(lastJointStates.at(i).motionState[0], 0);
+			}
 			mCurrentState = BREAK;
 		}
 		
-		res.pwm = mJointController->control(jointState.motionState, goal);
-		res.setpoint_pos = goal[0];
-		res.setpoint_vel = goal[1];
-		checkAndSetPWM(res);
+		robot::JointPowers outputs = mJointController->computeControl(controlInput, controlSetpoint);
+		
+		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+			jointStates.at(i).setpoint_pos = controlSetpoint.at(i)[0];
+			jointStates.at(i).setpoint_vel = controlSetpoint.at(i)[1];
+		}
+		
+		checkAndSetPWM(jointStates, outputs);
 		break;
 	}
-	
-	return res;
+	}
 }
 
-void MotionManager::checkAndSetPWM(arips_arm_msgs::JointState& state) {
-	// stop motors if moving to outside limits
-	float predictedNextPos = state.position + state.velocity * ArmConfig::CONTROL_PERIOD_S;
-	if ((predictedNextPos <= ArmConfig::JOINT_LIMIT_MIN && state.velocity < 0)
-			|| (predictedNextPos >= ArmConfig::JOINT_LIMIT_MAX && state.velocity > 0)) {
-		state.pwm = 0;
-		mActuator->stop();
-	} else {
-		mActuator->set(state.pwm);
+void MotionManager::checkAndSetPWM(JointStatesMsg& states, robot::JointPowers& powers) {
+	mArmHardware->setJointPowers(powers);
+	
+	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+		states.at(i).pwm = powers.at(i);
 	}
 }
 

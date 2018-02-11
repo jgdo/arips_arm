@@ -7,6 +7,8 @@
 
 #include <path/TrajectoryPathBuffer.h>
 
+using namespace robot::ArmConfig;
+
 namespace path {
 
 TrajectoryPathBuffer::TrajectoryPathBuffer() {
@@ -20,9 +22,9 @@ void TrajectoryPathBuffer::newTrajectory(size_t trajectorySize) {
 	mRemainingTrajectorySize = trajectorySize;
 }
 
-bool TrajectoryPathBuffer::addTrajectoryPoint(const TrajectoryPoint& point) {
+bool TrajectoryPathBuffer::addTrajectoryPoint(const arips_arm_msgs::TrajectoryPoint& point) {
 	uint32_t nextEnd = nextIndex(mBufferEnd);
-	if(nextEnd == mBufferStart) {
+	if (nextEnd == mBufferStart) {
 		return false;
 	}
 	
@@ -31,12 +33,16 @@ bool TrajectoryPathBuffer::addTrajectoryPoint(const TrajectoryPoint& point) {
 	return true;
 }
 
-TrajectoryPathBuffer::PointState TrajectoryPathBuffer::getNextSetpoint(Vec2f currentState, Vec2f* point) {
-	if(mRemainingTrajectorySize <= 0) {
+TrajectoryPathBuffer::PointState TrajectoryPathBuffer::getNextSetpoint(robot::JointMotionStates* setpoint) {
+	if (mRemainingTrajectorySize <= 0) {
 		return FINISHED;
-	}	if(getCurrentBufferSize()) {
-		point->x() = mTrajectoryBuffer[mBufferStart].joints[0].position;
-		point->y() = mTrajectoryBuffer[mBufferStart].joints[0].velocity;
+	}
+	if (getCurrentBufferSize()) {
+		for(size_t i = 0; i < NUM_JOINTS; i++) {
+			setpoint->at(i)[0] = mTrajectoryBuffer[mBufferStart].goals.at(i).position;
+			setpoint->at(i)[1] = mTrajectoryBuffer[mBufferStart].goals.at(i).velocity;
+		}
+		
 		mBufferStart = nextIndex(mBufferStart);
 		mRemainingTrajectorySize--;
 		return VALID;
@@ -44,6 +50,5 @@ TrajectoryPathBuffer::PointState TrajectoryPathBuffer::getNextSetpoint(Vec2f cur
 		return EMPTY;
 	}
 }
-
 
 } /* namespace path */

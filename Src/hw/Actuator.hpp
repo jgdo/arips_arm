@@ -14,9 +14,24 @@ namespace hw {
 struct Actuator {
 	virtual ~Actuator() {}
 	
-	virtual void set(float value) = 0;
-	virtual void stop() = 0;
 	virtual const char* name() const = 0;
+	
+	/**
+	 * break the motors (e.g. by short-cutting)
+	 */
+	virtual void doBreak() = 0;
+	
+	/**
+	 * Make motors free-running
+	 */
+	virtual void release() = 0;
+	
+	/**
+	 * Activate motor and apply power
+	 * 
+	 * @param value power, [-1, 1] (unit not specified)
+	 */
+	virtual void apply(float value) = 0;
 };
 
 }

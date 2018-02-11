@@ -11,8 +11,14 @@
 #include <control/PIDController.h>
 #include <path/RosMotionManager.h>
 #include <utl/ParameterServer.h>
+#include <robot/JointStateObserver.h>
+
+#include <control/IndividualGroupController.h>
+#include <robot/RobotArmHardware.h>
 
 using ros::nh;
+
+using namespace robot;
 
 extern "C" {
 int cpp_main(void);
@@ -26,9 +32,16 @@ int cpp_main() {
 	nh.initNode();
 	utl::ParameterServer::init();
 	
-	ctrl::VelocityPIDController pid(-1, 1);
-	path::JointStateObserver jso;
-	path::RosMotionManager motionMan(&pid, &hw::l298motor0, &jso);
+	// TODO observers for correct joint
+	JointStateObserver jso[5];
+	RobotArmHardware armHw({ &hw::l298motor0, &hw::l298motor1, &hw::l298motor2, &hw::l298motor3, &hw::l298motor4 }, 
+												 { jso+0, jso+1, jso+2, jso+3, jso+4 });
+	
+	
+	ctrl::VelocityPIDController pid0(-1, 1), pid1(-1, 1), pid2(-1, 1), pid3(-1, 1), pid4(-1, 1);
+	ctrl::IndividualGroupController<Vec2f, ArmConfig::NUM_JOINTS> controller({&pid0, &pid1, &pid2, &pid3, &pid4});
+	
+	path::RosMotionManager motionMan(&controller, &armHw);
 	
 	auto handle = SysTickTimer::createTimer(10, [&]() {
 		
