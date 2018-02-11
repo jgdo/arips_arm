@@ -9,7 +9,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * Copyright (c) 2017 STMicroelectronics International N.V. 
+  * Copyright (c) 2018 STMicroelectronics International N.V. 
   * All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -58,21 +58,59 @@
 
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
-#define SERVO_1_POTI_Pin GPIO_PIN_0
-#define SERVO_1_POTI_GPIO_Port GPIOA
-#define SERVO_2_POTI_Pin GPIO_PIN_1
-#define SERVO_2_POTI_GPIO_Port GPIOA
-#define IN_1_Pin GPIO_PIN_12
-#define IN_1_GPIO_Port GPIOB
-#define IN_2_Pin GPIO_PIN_13
-#define IN_2_GPIO_Port GPIOB
-#define EN_A_Pin GPIO_PIN_8
-#define EN_A_GPIO_Port GPIOA
+#define JOINT0_ADC_Pin GPIO_PIN_0
+#define JOINT0_ADC_GPIO_Port GPIOA
+#define JOINT1_ADC_Pin GPIO_PIN_1
+#define JOINT1_ADC_GPIO_Port GPIOA
+#define JOINT2_ADC_Pin GPIO_PIN_2
+#define JOINT2_ADC_GPIO_Port GPIOA
+#define JOINT34_LEFT_ADC_Pin GPIO_PIN_3
+#define JOINT34_LEFT_ADC_GPIO_Port GPIOA
+#define JOINT34_RIGHT_ADC_Pin GPIO_PIN_4
+#define JOINT34_RIGHT_ADC_GPIO_Port GPIOA
+#define GRIPPER_ADC_Pin GPIO_PIN_5
+#define GRIPPER_ADC_GPIO_Port GPIOA
+#define JOINT34_LEFT_IN1_Pin GPIO_PIN_6
+#define JOINT34_LEFT_IN1_GPIO_Port GPIOA
+#define JOINT34_LEFT_IN2_Pin GPIO_PIN_7
+#define JOINT34_LEFT_IN2_GPIO_Port GPIOA
+#define JOINT1_IN1_Pin GPIO_PIN_0
+#define JOINT1_IN1_GPIO_Port GPIOB
+#define JOINT1_IN2_Pin GPIO_PIN_1
+#define JOINT1_IN2_GPIO_Port GPIOB
+#define GRIPPER_EN_Pin GPIO_PIN_10
+#define GRIPPER_EN_GPIO_Port GPIOB
+#define JOINT0_IN1_Pin GPIO_PIN_12
+#define JOINT0_IN1_GPIO_Port GPIOB
+#define JOINT0_IN2_Pin GPIO_PIN_13
+#define JOINT0_IN2_GPIO_Port GPIOB
+#define JOINT1_EN_Pin GPIO_PIN_14
+#define JOINT1_EN_GPIO_Port GPIOB
+#define JOINT2_EN_Pin GPIO_PIN_15
+#define JOINT2_EN_GPIO_Port GPIOB
+#define JOINT0_EN_Pin GPIO_PIN_8
+#define JOINT0_EN_GPIO_Port GPIOA
+#define JOINT34_LEFT_EN_Pin GPIO_PIN_15
+#define JOINT34_LEFT_EN_GPIO_Port GPIOA
+#define JOINT34_RIGHT_EN_Pin GPIO_PIN_3
+#define JOINT34_RIGHT_EN_GPIO_Port GPIOB
+#define GRIPPER_IN1_Pin GPIO_PIN_4
+#define GRIPPER_IN1_GPIO_Port GPIOB
+#define GRIPPER_IN2_Pin GPIO_PIN_5
+#define GRIPPER_IN2_GPIO_Port GPIOB
+#define JOINT34_RIGHT_IN1_Pin GPIO_PIN_6
+#define JOINT34_RIGHT_IN1_GPIO_Port GPIOB
+#define JOINT34_RIGHT_IN2_Pin GPIO_PIN_7
+#define JOINT34_RIGHT_IN2_GPIO_Port GPIOB
+#define JOINT2_IN1_Pin GPIO_PIN_8
+#define JOINT2_IN1_GPIO_Port GPIOB
+#define JOINT2_IN2_Pin GPIO_PIN_9
+#define JOINT2_IN2_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
 #define ADC_DMA_BUF_NUM_SAMPLES 128
-#define ADC_CHANNELS_IN_USE 2
+#define ADC_CHANNELS_IN_USE 6
 #define ADC_DMA_BUF_SIZE (ADC_CHANNELS_IN_USE * ADC_DMA_BUF_NUM_SAMPLES)
 extern uint32_t gAdcDMABuffer[ADC_DMA_BUF_SIZE];
 

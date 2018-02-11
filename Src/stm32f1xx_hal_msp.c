@@ -10,7 +10,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * Copyright (c) 2017 STMicroelectronics International N.V. 
+  * Copyright (c) 2018 STMicroelectronics International N.V. 
   * All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -107,9 +107,14 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
   
     /**ADC1 GPIO Configuration    
     PA0-WKUP     ------> ADC1_IN0
-    PA1     ------> ADC1_IN1 
+    PA1     ------> ADC1_IN1
+    PA2     ------> ADC1_IN2
+    PA3     ------> ADC1_IN3
+    PA4     ------> ADC1_IN4
+    PA5     ------> ADC1_IN5 
     */
-    GPIO_InitStruct.Pin = SERVO_1_POTI_Pin|SERVO_2_POTI_Pin;
+    GPIO_InitStruct.Pin = JOINT0_ADC_Pin|JOINT1_ADC_Pin|JOINT2_ADC_Pin|JOINT34_LEFT_ADC_Pin 
+                          |JOINT34_RIGHT_ADC_Pin|GRIPPER_ADC_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -150,9 +155,14 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
   
     /**ADC1 GPIO Configuration    
     PA0-WKUP     ------> ADC1_IN0
-    PA1     ------> ADC1_IN1 
+    PA1     ------> ADC1_IN1
+    PA2     ------> ADC1_IN2
+    PA3     ------> ADC1_IN3
+    PA4     ------> ADC1_IN4
+    PA5     ------> ADC1_IN5 
     */
-    HAL_GPIO_DeInit(GPIOA, SERVO_1_POTI_Pin|SERVO_2_POTI_Pin);
+    HAL_GPIO_DeInit(GPIOA, JOINT0_ADC_Pin|JOINT1_ADC_Pin|JOINT2_ADC_Pin|JOINT34_LEFT_ADC_Pin 
+                          |JOINT34_RIGHT_ADC_Pin|GRIPPER_ADC_Pin);
 
     /* ADC1 DMA DeInit */
     HAL_DMA_DeInit(hadc->DMA_Handle);
@@ -177,6 +187,17 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 
   /* USER CODE END TIM1_MspInit 1 */
   }
+  else if(htim_base->Instance==TIM2)
+  {
+  /* USER CODE BEGIN TIM2_MspInit 0 */
+
+  /* USER CODE END TIM2_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_TIM2_CLK_ENABLE();
+  /* USER CODE BEGIN TIM2_MspInit 1 */
+
+  /* USER CODE END TIM2_MspInit 1 */
+  }
 
 }
 
@@ -189,18 +210,51 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
   /* USER CODE BEGIN TIM1_MspPostInit 0 */
 
   /* USER CODE END TIM1_MspPostInit 0 */
-  
     /**TIM1 GPIO Configuration    
+    PB14     ------> TIM1_CH2N
+    PB15     ------> TIM1_CH3N
     PA8     ------> TIM1_CH1 
     */
-    GPIO_InitStruct.Pin = EN_A_Pin;
+    GPIO_InitStruct.Pin = JOINT1_EN_Pin|JOINT2_EN_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(EN_A_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = JOINT0_EN_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(JOINT0_EN_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN TIM1_MspPostInit 1 */
 
   /* USER CODE END TIM1_MspPostInit 1 */
+  }
+  else if(htim->Instance==TIM2)
+  {
+  /* USER CODE BEGIN TIM2_MspPostInit 0 */
+
+  /* USER CODE END TIM2_MspPostInit 0 */
+  
+    /**TIM2 GPIO Configuration    
+    PB10     ------> TIM2_CH3
+    PA15     ------> TIM2_CH1
+    PB3     ------> TIM2_CH2 
+    */
+    GPIO_InitStruct.Pin = GRIPPER_EN_Pin|JOINT34_RIGHT_EN_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = JOINT34_LEFT_EN_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(JOINT34_LEFT_EN_GPIO_Port, &GPIO_InitStruct);
+
+    __HAL_AFIO_REMAP_TIM2_ENABLE();
+
+  /* USER CODE BEGIN TIM2_MspPostInit 1 */
+
+  /* USER CODE END TIM2_MspPostInit 1 */
   }
 
 }
@@ -218,6 +272,17 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
   /* USER CODE BEGIN TIM1_MspDeInit 1 */
 
   /* USER CODE END TIM1_MspDeInit 1 */
+  }
+  else if(htim_base->Instance==TIM2)
+  {
+  /* USER CODE BEGIN TIM2_MspDeInit 0 */
+
+  /* USER CODE END TIM2_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_TIM2_CLK_DISABLE();
+  /* USER CODE BEGIN TIM2_MspDeInit 1 */
+
+  /* USER CODE END TIM2_MspDeInit 1 */
   }
 
 }

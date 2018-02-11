@@ -16,11 +16,14 @@ namespace robot {
 
 class JointStateObserver {
 public:
-	JointStateObserver(): mLastPos(hw::adc::getAll()[1]), mLastVel(0), mLastMs(hw::clock::getTimeMs()) {
+	JointStateObserver(size_t index): 
+		mAdcIndex(index),
+		mLastPos(hw::adc::getAll()[1]), mLastVel(0), mLastMs(hw::clock::getTimeMs()) 
+	{
 	}
 	
 	inline JointState observeJointState() {
-		auto adc = hw::adc::getAll()[1];
+		auto adc = hw::adc::getAll()[mAdcIndex];
 		float pos = adc / 4096.0f;
 		
 		uint32_t now = hw::clock::getTimeMs();
@@ -36,6 +39,7 @@ public:
 	}
 	
 private:	
+	size_t mAdcIndex;
 	float mLastPos, mLastVel;
 	uint32_t mLastMs;
 };

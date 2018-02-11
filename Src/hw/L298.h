@@ -71,6 +71,7 @@ extern L298Motor l298motor1;
 extern L298Motor l298motor2; 
 extern L298Motor l298motor3; 
 extern L298Motor l298motor4; 
+extern L298Motor l298motor5; 
 
 } // namespace hw 
 
