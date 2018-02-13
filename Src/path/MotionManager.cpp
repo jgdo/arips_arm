@@ -21,15 +21,6 @@ MotionManager::~MotionManager() {
 	
 }
 
-void MotionManager::setNewSingleGoal(float position) {
-	// TODO: remove completely?
-	mCurrentState = SINGLE_GOAL;
-	mControlCycleCount = 0;
-	mPathStartTimeMs = hw::clock::getTimeMs();
-	// mSingleTargetProvider.setTarget(0.0, position, mJointStateObserver->getCurrentJointState().motionState);
-	mArmHardware->breakMotors();
-}
-
 void MotionManager::startFollowingTrajectory() {
 	mCurrentState = TRAJECTORY;
 	mControlCycleCount = 0;
@@ -39,11 +30,27 @@ void MotionManager::startFollowingTrajectory() {
 void MotionManager::stop() {
 	mCurrentState = BREAK;
 	mControlCycleCount = 0;
+	mArmHardware->breakMotors();
 }
 
 void MotionManager::release() {
 	mCurrentState = IDLE;
 	mControlCycleCount = 0;
+	mArmHardware->releaseMotors();
+}
+
+void MotionManager::enterRawMode() {
+	mCurrentState = RAW;
+	mRawJointPowers.fill(0);
+	mArmHardware->setJointPowers(mRawJointPowers);
+}
+
+
+void path::MotionManager::setRawMotorPowers(const robot::JointPowers& powers) {
+	if(mCurrentState == RAW) {
+		mRawJointPowers = powers;
+		mArmHardware->setJointPowers(mRawJointPowers);
+	}
 }
 
 void MotionManager::onControlTick(JointStatesMsg& jointStates) {
@@ -73,10 +80,17 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 		mArmHardware->breakMotors();
 		break;
 		
-	case SINGLE_GOAL:
-		mControlCycleCount++;
-		// fallthrough
-		// TODO: consider removing completely
+	case RAW:
+		// set powers without checking since raw mode
+		mArmHardware->setJointPowers(mRawJointPowers);
+		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+			
+			jointStates.at(i).pwm = mRawJointPowers.at(i);
+			jointStates.at(i).setpoint_pos = lastJointStates.at(i).motionState[0];
+			jointStates.at(i).setpoint_vel = lastJointStates.at(i).motionState[1];
+		}
+		break;
+		
 	case HOLD: { // motors should hold position
 		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
 			controlSetpoint.at(i) = Vec2f::Zero();
@@ -93,19 +107,6 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 	}
 		break;
 		
-		/*
-		 case SINGLE_GOAL: { // moving to a final goal
-		 mControlCycleCount++;
-		 //Vec2f goal = mSingleTargetProvider.getSetpoint(dtStart, jointState.motionState);
-		 //res.pwm = mJointController->control(jointState.motionState, goal);
-		 //res.setpoint_pos = goal[0];
-		 //res.setpoint_vel = goal[1];
-		 checkAndSetPWM(jointStates);
-		 }
-		 break;
-		 
-		 */
-
 	case TRAJECTORY: {
 		TrajectoryPathBuffer::PointState ps = mTrajectoryPathBuffer.getNextSetpoint(&controlSetpoint);
 		if (ps == TrajectoryPathBuffer::VALID) {
@@ -145,3 +146,4 @@ void MotionManager::checkAndSetPWM(JointStatesMsg& states, robot::JointPowers& p
 }
 
 } /* namespace path */
+

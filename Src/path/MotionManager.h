@@ -8,7 +8,6 @@
 #ifndef PATH_MOTIONMANAGER_H_
 #define PATH_MOTIONMANAGER_H_
 
-#include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <arips_arm_msgs/JointState.h>
 
 #include <control/Controller.h>
@@ -28,7 +27,7 @@ public:
 		IDLE = 0, // motors are turned off
 		BREAK, // motors are short-cut
 		HOLD, // motors should hold position
-		SINGLE_GOAL, // moving to a final goal
+		RAW, // raw mode
 		TRAJECTORY, // trajectory (setpoint sequence)
 	};
 	
@@ -45,12 +44,6 @@ public:
 	 */
 	void onControlTick(JointStatesMsg& jointStates);
 	
-	/**
-	 * Cancel current goal and set new single goal
-	 * 
-	 * @param[in] point goal movement point
-	 */
-	void setNewSingleGoal(float position);
 	
 	/**
 	 * Start following trajectory in trajectory buffer
@@ -67,6 +60,11 @@ public:
 	 */
 	void release();
 	
+	/**
+	 * Set motor powers to 0 and enter raw mode
+	 */
+	void enterRawMode();
+	
 	inline TrajectoryPathBuffer& getTrajectoryBuffer() {
 		return mTrajectoryPathBuffer;
 	}
@@ -79,6 +77,8 @@ public:
 		return mControlCycleCount;
 	}
 	
+	void setRawMotorPowers(const robot::JointPowers& powers);
+	
 private:
 	State mCurrentState = IDLE;
 	
@@ -90,6 +90,8 @@ private:
 	
 	uint32_t mPathStartTimeMs = 0;
 	uint32_t mControlCycleCount = 0;
+	
+	robot::JointPowers mRawJointPowers; // powers during raw mode
 	
 	void checkAndSetPWM(JointStatesMsg& states, robot::JointPowers& powers);
 };

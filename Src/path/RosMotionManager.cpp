@@ -12,13 +12,17 @@ using namespace robot::ArmConfig;
 namespace path {
 
 RosMotionManager::RosMotionManager(robot::RobotArmController* controller, robot::RobotArmHardware* arm) :
-		mMotionManager(controller, arm), mMotionCmdSub("motion_command", &RosMotionManager::onMotionCommandCb, this), mTrajBuffSub(
-		    "traj_buffer_command", &RosMotionManager::onTrajectoryBuffCb, this), mMotionStatePub("motion_state",
-		    &mMotionStateMsg) {
+		mMotionManager(controller, arm), 
+		mMotionCmdSub("motion_command", &RosMotionManager::onMotionCommandCb, this), 
+		mTrajBuffSub("traj_buffer_command", &RosMotionManager::onTrajectoryBuffCb, this), 
+		mRawMotorSub("raw_motor_command", &RosMotionManager::onRawMotorCommandCb, this),
+		mMotionStatePub("motion_state", &mMotionStateMsg) 
+{
 	
 	ros::nh.advertise(mMotionStatePub);
 	ros::nh.subscribe(mMotionCmdSub);
 	ros::nh.subscribe(mTrajBuffSub);
+	ros::nh.subscribe(mRawMotorSub);
 }
 
 void RosMotionManager::onControlTick() {
@@ -35,11 +39,11 @@ void RosMotionManager::onControlTick() {
 void RosMotionManager::onMotionCommandCb(const arips_arm_msgs::MotionCommand& msg) {
 	using arips_arm_msgs::MotionCommand;
 	
-	if (msg.command == MotionCommand::CMD_SINGLE_TARGET) {
-		mMotionManager.setNewSingleGoal(msg.st_position);
+	if (msg.command == MotionCommand::CMD_RAW) {
+		mMotionManager.enterRawMode();
 	} else if (msg.command == MotionCommand::CMD_START_TRAJECTORY) {
 		mMotionManager.startFollowingTrajectory();
-	} else if (msg.command == MotionCommand::CMD_STOP) {
+	} else if (msg.command == MotionCommand::CMD_BREAK) {
 		mMotionManager.stop();
 	} else if (msg.command == MotionCommand::CMD_RELEASE) {
 		mMotionManager.release();
@@ -66,6 +70,10 @@ void RosMotionManager::onTrajectoryBuffCb(const arips_arm_msgs::TrajectoryBuffer
 			}
 		}
 	}
+}
+
+void RosMotionManager::onRawMotorCommandCb(const arips_arm_msgs::RawMotorCommand& msg) {
+	mMotionManager.setRawMotorPowers(msg.raw_motor_power);
 }
 
 } /* namespace path */

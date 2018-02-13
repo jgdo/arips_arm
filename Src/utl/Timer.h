@@ -14,7 +14,7 @@ public:
 	virtual ~SysTickTimer();
 
 	template<class T>
-	static SysTickTimerHandle createTimer(uint32_t period, T callback, bool autostart=true);
+	static SysTickTimerHandle createTimer(uint32_t period, T&& callback, bool autostart=true);
 
 	void start();
 
@@ -45,12 +45,13 @@ private:
 };
 
 template<class T>
-SysTickTimerHandle SysTickTimer::createTimer(uint32_t period, T callback, bool autostart) {
+SysTickTimerHandle SysTickTimer::createTimer(uint32_t period, T&& callback, bool autostart) {
 	
 	class SysTickTimerImpl: public SysTickTimer {
 	public:
-		inline SysTickTimerImpl(uint32_t period, T runable, bool autostart) :
-				SysTickTimer(period), mRunable(runable) {
+		inline SysTickTimerImpl(uint32_t period, T&& runable, bool autostart) :
+				SysTickTimer(period), 
+				mRunable(runable) {
 			if(autostart)
 				start();
 		}
@@ -64,7 +65,7 @@ SysTickTimerHandle SysTickTimer::createTimer(uint32_t period, T callback, bool a
 		T mRunable;
 	};
 	
-	return SysTickTimerHandle(new SysTickTimerImpl(period, callback, autostart));
+	return SysTickTimerHandle(new SysTickTimerImpl(period, std::forward<T>(callback), autostart));
 }
 
 // ----------------------------------------------------------------------------
