@@ -22,11 +22,11 @@ public:
 	virtual ~L298Motor() {}
 	
 	virtual void apply(float value) override {
-		if (value > 0.1) {
+		if (value > 0.05) {
 				HAL_GPIO_WritePin(mIn1Port, mIn1Pin, GPIO_PIN_SET);
 				HAL_GPIO_WritePin(mIn2Port, mIn2Pin, GPIO_PIN_RESET);
 				mCCR = (uint16_t) (value * (mTimer->ARR-1));
-			} else if (value < -0.1) {
+			} else if (value < -0.05) {
 				HAL_GPIO_WritePin(mIn1Port, mIn1Pin, GPIO_PIN_RESET);
 				HAL_GPIO_WritePin(mIn2Port, mIn2Pin, GPIO_PIN_SET);
 				mCCR = (uint16_t) -(value * (mTimer->ARR-1));
