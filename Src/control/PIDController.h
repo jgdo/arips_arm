@@ -12,7 +12,7 @@
 
 #include <utl/ParameterServer.h>
 
-#include <Eigen/Dense>
+#include <utl/vecdef.h>
 
 namespace ctrl {
 

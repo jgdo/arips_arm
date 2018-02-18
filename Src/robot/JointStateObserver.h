@@ -22,11 +22,21 @@ public:
 		mAdcIndex(index),
 		mLastPos(hw::adc::getAll()[1]), mLastVel(0), mLastMs(hw::clock::getTimeMs()) 
 	{
+		static const float initLimits[5][2] = {
+				{-0.0008650, 1829},
+				{-0.0011508, 1923},
+				{-0.0012900, 1969},
+				{-0.0009251, 2040},
+				{-0.0013495, 1901}
+		}; 
+		
+		mParams.factor.mValue = initLimits[index][0];
+		mParams.offset.mValue = initLimits[index][1];
 	}
 	
 	inline JointState observeJointState() {
 		auto adc = hw::adc::getAll()[mAdcIndex];
-		float pos = adc * mParams.factor.mValue + mParams.offset.mValue;
+		float pos = (adc - mParams.offset.mValue) * mParams.factor.mValue;
 		
 		uint32_t now = hw::clock::getTimeMs();
 		uint32_t dt = now - mLastMs;

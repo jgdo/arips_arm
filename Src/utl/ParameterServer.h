@@ -52,12 +52,12 @@ public:
 	}
 	
 	virtual void fillValue(tiny_reconfigure::ParameterDef::_value_int_type* value_int, 
-			tiny_reconfigure::ParameterDef::_value_float_type* value_float) const override {
+			tiny_reconfigure::ParameterDef::_value_float_type*) const override {
 		*value_int = mValue;
 	}
 	
 	virtual void setValue(tiny_reconfigure::ParameterDef::_value_int_type value_int, 
-					tiny_reconfigure::ParameterDef::_value_float_type value_float) override {
+					tiny_reconfigure::ParameterDef::_value_float_type) override {
 		mValue = value_int;
 	}
 	
@@ -77,12 +77,12 @@ public:
 		return tiny_reconfigure::ParameterDef::TYPE_FLOAT;
 	}
 	
-	virtual void fillValue(tiny_reconfigure::ParameterDef::_value_int_type* value_int, 
+	virtual void fillValue(tiny_reconfigure::ParameterDef::_value_int_type*, 
 			tiny_reconfigure::ParameterDef::_value_float_type* value_float) const override {
 		*value_float = mValue;
 	}
 	
-	virtual void setValue(tiny_reconfigure::ParameterDef::_value_int_type value_int, 
+	virtual void setValue(tiny_reconfigure::ParameterDef::_value_int_type, 
 						tiny_reconfigure::ParameterDef::_value_float_type value_float) override {
 	mValue = value_float;
 }

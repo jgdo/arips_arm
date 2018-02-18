@@ -22,7 +22,7 @@ public:
 	virtual float computeControl(ValueType input, ValueType setpoint) = 0;
 };
 
-};
+}
 
 
 #endif /* CONTROL_CONTROLLER_H_ */

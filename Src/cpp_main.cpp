@@ -47,7 +47,7 @@ int cpp_main() {
 		motionMan.onControlTick();
 	});
 	
-	int i = 0;
+	// int i = 0;
 	while (1) {
 		SysTickTimer::handleTimers();
 		nh.spinOnce();

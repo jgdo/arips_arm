@@ -10,8 +10,6 @@
 
 #include <array>
 
-#include <Eigen/Dense>
-
 #include <utl/vecdef.h>
 
 #include "ArmConfig.h"

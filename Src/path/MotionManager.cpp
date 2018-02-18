@@ -62,7 +62,7 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 	mArmHardware->readJointStates();
 	const robot::JointStates& lastJointStates = mArmHardware->getJointStates();
 	
-	float dtStart = (hw::clock::getTimeMs() - mPathStartTimeMs) * 0.001F;
+	// float dtStart = (hw::clock::getTimeMs() - mPathStartTimeMs) * 0.001F;
 	
 	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
 		jointStates.at(i).position = lastJointStates.at(i).motionState[0];
@@ -150,6 +150,7 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 
 void MotionManager::checkAndSetPWM(JointStatesMsg& states, robot::JointPowers& powers) {
 	mArmHardware->setJointPowers(powers);
+	(void)states;
 	// TODO check error state
 	//for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
 	//	states.at(i).pwm = powers.at(i);
