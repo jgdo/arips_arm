@@ -27,7 +27,8 @@ public:
 		IDLE = 0, // motors are turned off
 		BREAK, // motors are short-cut
 		HOLD, // motors should hold position
-		RAW, // raw mode
+		RAW_MOTORS, // raw mode
+		DIRECT_JOINTS, // direct joint control with limit checks
 		TRAJECTORY, // trajectory (setpoint sequence)
 	};
 	
@@ -64,6 +65,11 @@ public:
 	 * Set motor powers to 0 and enter raw mode
 	 */
 	void enterRawMode();
+	
+	/**
+	 * Direct joint control with limits check
+	 */
+	void enterDirectJointsMode();
 	
 	inline TrajectoryPathBuffer& getTrajectoryBuffer() {
 		return mTrajectoryPathBuffer;

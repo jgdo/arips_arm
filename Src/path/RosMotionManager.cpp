@@ -39,7 +39,7 @@ void RosMotionManager::onControlTick() {
 void RosMotionManager::onMotionCommandCb(const arips_arm_msgs::MotionCommand& msg) {
 	using arips_arm_msgs::MotionCommand;
 	
-	if (msg.command == MotionCommand::CMD_RAW) {
+	if (msg.command == MotionCommand::CMD_RAW_MOTORS) {
 		mMotionManager.enterRawMode();
 	} else if (msg.command == MotionCommand::CMD_START_TRAJECTORY) {
 		mMotionManager.startFollowingTrajectory();

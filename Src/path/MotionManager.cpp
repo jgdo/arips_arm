@@ -40,14 +40,19 @@ void MotionManager::release() {
 }
 
 void MotionManager::enterRawMode() {
-	mCurrentState = RAW;
+	mCurrentState = RAW_MOTORS;
+	mRawJointPowers.fill(0);
+	mArmHardware->setRawMotorPowers(mRawJointPowers);
+}
+
+void path::MotionManager::enterDirectJointsMode() {
+	mCurrentState = DIRECT_JOINTS;
 	mRawJointPowers.fill(0);
 	mArmHardware->setJointPowers(mRawJointPowers);
 }
 
-
 void path::MotionManager::setRawMotorPowers(const robot::JointPowers& powers) {
-	if(mCurrentState == RAW) {
+	if (mCurrentState == RAW_MOTORS) {
 		mRawJointPowers = powers;
 		mArmHardware->setJointPowers(mRawJointPowers);
 	}
@@ -60,7 +65,6 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 	float dtStart = (hw::clock::getTimeMs() - mPathStartTimeMs) * 0.001F;
 	
 	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-		jointStates.at(i).adc_raw = lastJointStates.at(i).rawPosition;
 		jointStates.at(i).position = lastJointStates.at(i).motionState[0];
 		jointStates.at(i).velocity = lastJointStates.at(i).motionState[1];
 	}
@@ -80,16 +84,23 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 		mArmHardware->breakMotors();
 		break;
 		
-	case RAW:
-		// set powers without checking since raw mode
-		mArmHardware->setJointPowers(mRawJointPowers);
+	case RAW_MOTORS:
 		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-			
-			jointStates.at(i).pwm = mRawJointPowers.at(i);
+			jointStates.at(i).torque = 0;
 			jointStates.at(i).setpoint_pos = lastJointStates.at(i).motionState[0];
 			jointStates.at(i).setpoint_vel = lastJointStates.at(i).motionState[1];
 		}
 		break;
+		
+	case DIRECT_JOINTS:
+			// set powers without checking since raw mode
+			mArmHardware->setJointPowers(mRawJointPowers);
+			for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+				jointStates.at(i).torque = mRawJointPowers.at(i);
+				jointStates.at(i).setpoint_pos = lastJointStates.at(i).motionState[0];
+				jointStates.at(i).setpoint_vel = lastJointStates.at(i).motionState[1];
+			}
+			break;
 		
 	case HOLD: { // motors should hold position
 		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
@@ -139,11 +150,10 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 
 void MotionManager::checkAndSetPWM(JointStatesMsg& states, robot::JointPowers& powers) {
 	mArmHardware->setJointPowers(powers);
-	
-	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-		states.at(i).pwm = powers.at(i);
-	}
+	// TODO check error state
+	//for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+	//	states.at(i).pwm = powers.at(i);
+	//}
 }
 
 } /* namespace path */
-

@@ -8,6 +8,7 @@
 #ifndef ROBOT_JOINTSTATEOBSERVER_H_
 #define ROBOT_JOINTSTATEOBSERVER_H_
 
+#include <utl/ParameterServer.h>
 #include <hw/ControllerHardware.h>
 
 #include "JointState.h"
@@ -16,7 +17,8 @@ namespace robot {
 
 class JointStateObserver {
 public:
-	JointStateObserver(size_t index): 
+	JointStateObserver(size_t index, const char* name): 
+		mParams(name),
 		mAdcIndex(index),
 		mLastPos(hw::adc::getAll()[1]), mLastVel(0), mLastMs(hw::clock::getTimeMs()) 
 	{
@@ -24,7 +26,7 @@ public:
 	
 	inline JointState observeJointState() {
 		auto adc = hw::adc::getAll()[mAdcIndex];
-		float pos = adc / 4096.0f;
+		float pos = adc * mParams.factor.mValue + mParams.offset.mValue;
 		
 		uint32_t now = hw::clock::getTimeMs();
 		uint32_t dt = now - mLastMs;
@@ -39,6 +41,19 @@ public:
 	}
 	
 private:	
+	struct Parameters: public utl::ParameterGroup {	
+		Parameters(const char* name):
+			utl::ParameterGroup(name),
+			factor("factor", this, 1.0f),
+			offset("offset", this, 0.0f)
+		{
+		}
+		
+		utl::FloatParam factor, offset;
+	};
+	
+	Parameters mParams;
+	
 	size_t mAdcIndex;
 	float mLastPos, mLastVel;
 	uint32_t mLastMs;
