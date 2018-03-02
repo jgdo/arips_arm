@@ -29,6 +29,7 @@ public:
 		HOLD, // motors should hold position
 		RAW_MOTORS, // raw mode
 		DIRECT_JOINTS, // direct joint control with limit checks
+		DIRECT_CONTROLLER, // provide joint setpoints directly instead over a trajectory
 		TRAJECTORY, // trajectory (setpoint sequence)
 	};
 	
@@ -71,6 +72,8 @@ public:
 	 */
 	void enterDirectJointsMode();
 	
+	void enterDirectControllerMode();
+	
 	inline TrajectoryPathBuffer& getTrajectoryBuffer() {
 		return mTrajectoryPathBuffer;
 	}
@@ -97,7 +100,12 @@ private:
 	uint32_t mPathStartTimeMs = 0;
 	uint32_t mControlCycleCount = 0;
 	
-	robot::JointPowers mRawJointPowers; // powers during raw mode
+	/**
+	 * In RAW_MOTORS mode: raw motor pwm setpoint values
+	 * In DIRECT_JOINTS mode: joint effort setpoint values
+	 * In DIRECT_CONTROLLER mode: joint angle setpoint values as controller input
+	 */
+	robot::JointPowers mRawJointPowers;
 	
 	void checkAndSetPWM(JointStatesMsg& states, robot::JointPowers& powers);
 };

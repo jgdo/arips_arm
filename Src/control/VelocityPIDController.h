@@ -15,7 +15,7 @@ namespace ctrl {
 class VelocityPIDController: public Controller<Eigen::Vector2f> {
 public:
 
-	VelocityPIDController(float outMin, float outMax);
+	VelocityPIDController(const char* name, float outMin, float outMax);
 
 	virtual void reset() override;
 	virtual float computeControl(ValueType input, ValueType setpoint) override;

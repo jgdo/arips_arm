@@ -19,9 +19,9 @@ namespace ctrl {
 struct PIDParameters: public utl::ParameterGroup {	
 	PIDParameters(const char* name):
 		utl::ParameterGroup(name),
-		P("p", this, 40.0f),
-		I("i", this, 0.2f),
-		D("d", this, 1.5f)
+		P("p", this, 1.0f),
+		I("i", this, 0.0f),
+		D("d", this, 0.0f)
 	{
 	}
 	

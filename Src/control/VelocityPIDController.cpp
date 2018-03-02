@@ -25,8 +25,8 @@ struct UtlParamList<ctrl::VelocityPIDController::Parameters> {
 
 namespace ctrl {
 
-VelocityPIDController::VelocityPIDController(float outMin, float outMax) :
-		params("velocity_pid_params"), outMin(outMin), outMax(outMax) {
+VelocityPIDController::VelocityPIDController(const char* name, float outMin, float outMax) :
+		params(name), outMin(outMin), outMax(outMax) {
 }
 
 void VelocityPIDController::reset() {

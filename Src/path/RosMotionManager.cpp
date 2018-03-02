@@ -12,12 +12,9 @@ using namespace robot::ArmConfig;
 namespace path {
 
 RosMotionManager::RosMotionManager(robot::RobotArmController* controller, robot::RobotArmHardware* arm) :
-		mMotionManager(controller, arm), 
-		mMotionCmdSub("motion_command", &RosMotionManager::onMotionCommandCb, this), 
-		mTrajBuffSub("traj_buffer_command", &RosMotionManager::onTrajectoryBuffCb, this), 
-		mRawMotorSub("raw_motor_command", &RosMotionManager::onRawMotorCommandCb, this),
-		mMotionStatePub("motion_state", &mMotionStateMsg) 
-{
+		mMotionManager(controller, arm), mMotionCmdSub("motion_command", &RosMotionManager::onMotionCommandCb, this), mTrajBuffSub(
+				"traj_buffer_command", &RosMotionManager::onTrajectoryBuffCb, this), mRawMotorSub("raw_motor_command",
+				&RosMotionManager::onRawMotorCommandCb, this), mMotionStatePub("motion_state", &mMotionStateMsg) {
 	
 	ros::nh.advertise(mMotionStatePub);
 	ros::nh.subscribe(mMotionCmdSub);
@@ -25,9 +22,30 @@ RosMotionManager::RosMotionManager(robot::RobotArmController* controller, robot:
 	ros::nh.subscribe(mRawMotorSub);
 }
 
+inline static uint32_t stateToRosMode(MotionManager::State state) {
+	switch (state) {
+	case MotionManager::IDLE:
+		return arips_arm_msgs::MotionState::M_IDLE;
+	case MotionManager::BREAK:
+		return arips_arm_msgs::MotionState::M_BREAK;
+	case MotionManager::HOLD:
+		return arips_arm_msgs::MotionState::M_HOLD;
+	case MotionManager::RAW_MOTORS:
+		return arips_arm_msgs::MotionState::M_RAW_MOTORS;
+	case MotionManager::DIRECT_JOINTS:
+		return arips_arm_msgs::MotionState::M_DIRECT_JOINTS;
+	case MotionManager::DIRECT_CONTROLLER:
+		return arips_arm_msgs::MotionState::M_DIRECT_CONTROLLER;
+	case MotionManager::TRAJECTORY:
+		return arips_arm_msgs::MotionState::M_TRAJECTORY;
+	default:
+		return arips_arm_msgs::MotionState::M_IDLE;
+	}
+}
+
 void RosMotionManager::onControlTick() {
 	mMotionStateMsg.stamp = ros::Time::now();
-	mMotionStateMsg.mode = mMotionManager.getState();
+	mMotionStateMsg.mode = stateToRosMode(mMotionManager.getState());
 	mMotionManager.onControlTick(mMotionStateMsg.jointStates);
 	mMotionStateMsg.trajState.bufferCapacity = TrajectoryPathBuffer::TRAJECTORY_BUFFER_CAPACITY;
 	mMotionStateMsg.trajState.controlCycleCount = mMotionManager.getControlCycleCount();
@@ -47,6 +65,8 @@ void RosMotionManager::onMotionCommandCb(const arips_arm_msgs::MotionCommand& ms
 		mMotionManager.stop();
 	} else if (msg.command == MotionCommand::CMD_RELEASE) {
 		mMotionManager.release();
+	} else if (msg.command == MotionCommand::CMD_DIRECT_CONTROLLER) {
+		mMotionManager.enterDirectControllerMode();
 	}
 }
 

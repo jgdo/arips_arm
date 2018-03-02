@@ -47,7 +47,7 @@ public:
 			mLastMs = now;
 		} 
 		
-		return JointState { Vec2f(pos, mLastVel), adc };
+		return JointState { Vec2f(pos, mLastVel) };
 	}
 	
 private:	

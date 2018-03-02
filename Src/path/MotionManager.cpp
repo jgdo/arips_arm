@@ -55,6 +55,8 @@ void path::MotionManager::setRawMotorPowers(const robot::JointPowers& powers) {
 	if (mCurrentState == RAW_MOTORS) {
 		mRawJointPowers = powers;
 		mArmHardware->setJointPowers(mRawJointPowers);
+	} else if(mCurrentState == DIRECT_JOINTS || mCurrentState == DIRECT_CONTROLLER) {
+		mRawJointPowers = powers;
 	}
 }
 
@@ -143,8 +145,24 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 		}
 		
 		checkAndSetPWM(jointStates, outputs);
-		break;
 	}
+		break;
+		
+	case DIRECT_CONTROLLER:
+	{
+		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+			controlSetpoint.at(i) = Vec2f(mRawJointPowers.at(i), 0);
+		}
+		
+		robot::JointPowers outputs = mJointController->computeControl(controlInput, controlSetpoint);
+		
+		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+			jointStates.at(i).setpoint_pos = controlSetpoint.at(i)[0];
+			jointStates.at(i).setpoint_vel = controlSetpoint.at(i)[1];
+		}
+		checkAndSetPWM(jointStates, outputs);
+	}
+		break;
 	}
 }
 
@@ -158,3 +176,13 @@ void MotionManager::checkAndSetPWM(JointStatesMsg& states, robot::JointPowers& p
 }
 
 } /* namespace path */
+
+void path::MotionManager::enterDirectControllerMode() {
+	mCurrentState = DIRECT_CONTROLLER;
+	
+	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+		mRawJointPowers.at(i) = mArmHardware->getJointStates().at(i).motionState[0];
+	}
+	
+	mArmHardware->breakMotors();
+}

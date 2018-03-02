@@ -37,7 +37,7 @@ int cpp_main() {
 												 { &hw::l298motor0, &hw::l298motor1, &hw::l298motor2, &hw::l298motor3, &hw::l298motor4 },
 												 { jso + 0, jso + 1, jso + 2, jso + 3, jso + 4 });
 	
-	ctrl::VelocityPIDController pid0(-1, 1), pid1(-1, 1), pid2(-1, 1), pid3(-1, 1), pid4(-1, 1);
+	ctrl::VelocityPIDController pid0("pid_0", -0.7, 0.7), pid1("pid_1", -0.7, 0.7), pid2("pid_2", -0.7, 0.7), pid3("pid_3", -0.7, 0.7), pid4("pid_4", -0.7, 0.7);
 	ctrl::IndividualGroupController<Vec2f, ArmConfig::NUM_JOINTS> controller( { &pid0, &pid1, &pid2, &pid3, &pid4 });
 	
 	path::RosMotionManager motionMan(&controller, &armHw);
