@@ -20,9 +20,9 @@ public:
 	virtual void reset() override;
 	virtual float computeControl(ValueType input, ValueType setpoint) override;
 
-private:
 	PIDParameters params;
-
+	
+private:
 	float outMin, outMax;
 	
 	float isum = 0;

@@ -54,7 +54,7 @@ void path::MotionManager::enterDirectJointsMode() {
 void path::MotionManager::setRawMotorPowers(const robot::JointPowers& powers) {
 	if (mCurrentState == RAW_MOTORS) {
 		mRawJointPowers = powers;
-		mArmHardware->setJointPowers(mRawJointPowers);
+		mArmHardware->setRawMotorPowers(mRawJointPowers);
 	} else if(mCurrentState == DIRECT_JOINTS || mCurrentState == DIRECT_CONTROLLER) {
 		mRawJointPowers = powers;
 	}

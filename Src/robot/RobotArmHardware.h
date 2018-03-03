@@ -65,6 +65,8 @@ private:
 	std::array<hw::Actuator*, ArmConfig::NUM_JOINTS> mActuators;
 	std::array<JointStateObserver*, ArmConfig::NUM_JOINTS> mObservers;
 	JointStates mLastJointStates;
+	
+	bool limitJointPower(size_t index, JointPowers::value_type& power);
 };
 
 } /* namespace robot */
