@@ -66,6 +66,7 @@ int cpp_main() {
 	auto handle = SysTickTimer::createTimer(ArmConfig::CONTROL_PERIOD_MS, [&]() {
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 		motionMan.onControlTick();
+		resetWatchdog();
 	});
 	
 	// int i = 0;

@@ -116,6 +116,16 @@ extern uint32_t gAdcDMABuffer[ADC_DMA_BUF_SIZE];
 
 extern volatile float gAdcCurrentValue[ADC_CHANNELS_IN_USE];
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void resetWatchdog();
+
+#ifdef __cplusplus
+}
+#endif
+
 /* USER CODE END Private defines */
 
 void _Error_Handler(char *, int);

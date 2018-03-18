@@ -61,6 +61,8 @@ int cpp_main(void);
 ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
 
+IWDG_HandleTypeDef hiwdg;
+
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 
@@ -76,7 +78,8 @@ static void MX_DMA_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
-                                    
+static void MX_IWDG_Init(void);
+
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
                                 
                                 
@@ -90,6 +93,10 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 uint32_t gAdcDMABuffer[ADC_DMA_BUF_SIZE];
 volatile float gAdcCurrentValue[ADC_CHANNELS_IN_USE];
+
+void resetWatchdog() {
+	// HAL_IWDG_Refresh(&hiwdg);
+}
 
 /* USER CODE END 0 */
 
@@ -123,6 +130,7 @@ int main(void)
   MX_TIM1_Init();
   MX_ADC1_Init();
   MX_TIM2_Init();
+  MX_IWDG_Init();
 
   /* USER CODE BEGIN 2 */
   initialise_monitor_handles();
@@ -142,10 +150,14 @@ int main(void)
   HAL_ADC_Start_DMA(&hadc1, gAdcDMABuffer, ADC_DMA_BUF_SIZE);
   HAL_ADC_Start(&hadc1);
   
+  // HAL_IWDG_Start(&hiwdg);
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  printf("Start\n");
+  
   return cpp_main();
   /* USER CODE END WHILE */
 
@@ -165,10 +177,11 @@ void SystemClock_Config(void)
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
@@ -282,6 +295,20 @@ static void MX_ADC1_Init(void)
   sConfig.Channel = ADC_CHANNEL_5;
   sConfig.Rank = 6;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
+/* IWDG init function */
+static void MX_IWDG_Init(void)
+{
+
+  hiwdg.Instance = IWDG;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_32;
+  hiwdg.Init.Reload = 300;
+  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
