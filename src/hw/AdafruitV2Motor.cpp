@@ -34,10 +34,10 @@ void hw::AdafruitV2Motor::release() {
 float hw::AdafruitV2Motor::apply(float value) {
 	if (value > 0) {
 		mAdafruitMotor->run(FORWARD);
-		mAdafruitMotor->setSpeed12(std::min(int(value + 0.5f), 4095));
+		mAdafruitMotor->setSpeed12(std::min(int(value * 4095 + 0.5f), 4095));
 	} else {
 		mAdafruitMotor->run(BACKWARD);
-		mAdafruitMotor->setSpeed12(std::min(int(-value + 0.5f), 4095));
+		mAdafruitMotor->setSpeed12(std::min(int(-value * 4095 + 0.5f), 4095));
 	}
 
 	return std::clamp(value, -1.0f, 1.0f);

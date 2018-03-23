@@ -46,12 +46,12 @@ void setup() {
 
 void loop() {
 	RobotModel model;
-	JointStateObserver jso[ArmConfig::NUM_JOINTS] = { {0, "joint0_observer"} , {1, "joint1_observer"}, {2, "joint2_observer"}, {3, "joint3_observer"}, {4, "joint4_observer"} };
-	RobotArmHardware armHw(model, { hw::actuator::adafruitV2MotorL0_M1,
-									hw::actuator::adafruitV2MotorL0_M2,
-									hw::actuator::adafruitV2MotorL0_M3,
-									hw::actuator::adafruitV2MotorL0_M4,
-									hw::actuator::adafruitV2MotorL1_M1},
+	JointStateObserver jso[ArmConfig::NUM_JOINTS] = { {0, ADC6, "joint0_observer"} , {1, ADC7, "joint1_observer"}, {2, ADC8, "joint2_observer"}, {3, ADC9, "joint3_observer"}, {4, ADC10, "joint4_observer"} };
+	RobotArmHardware armHw(model, { hw::actuator::adafruitV2MotorL1_M1,
+									hw::actuator::adafruitV2MotorL1_M2,
+									hw::actuator::adafruitV2MotorL1_M3,
+									hw::actuator::adafruitV2MotorL1_M4,
+									hw::actuator::adafruitV2MotorL0_M1},
 								  { jso + 0, jso + 1, jso + 2, jso + 3, jso + 4 });
 
 	ctrl::VelocityPIDController pid[ArmConfig::NUM_JOINTS] =  {
@@ -63,11 +63,11 @@ void loop() {
 	};
 
 	static const float pidParams[ArmConfig::NUM_JOINTS][3] = {
-			{1.0, 0.06, 0.2},
-			{1.5, 0.05, 0.5},
-			{1.0, 0.05, 0.4},
-			{1.0, 0.02, 0.15},
-			{1.0, 0.02, 0.1}
+			{0.5, 0.02, 0.0},
+			{0.5, 0.02, 0.0},
+			{0.5, 0.02, 0.0},
+			{0.5, 0.02, 0.0},
+			{0.5, 0.02, 0.0}
 	};
 
 	for(size_t i = 0; i < ArmConfig::NUM_JOINTS; i++) {

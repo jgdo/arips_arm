@@ -17,10 +17,10 @@ namespace robot {
 
 class JointStateObserver {
 public:
-	JointStateObserver(size_t index, const char* name): 
+	JointStateObserver(size_t jointIndex, int adcIndex, const char* name):
 		mParams(name),
-		mAdcIndex(index),
-		mLastPos(hw::adc::getChannel(index)),
+		mAdcIndex(adcIndex),
+		mLastPos(hw::adc::getChannel(adcIndex)),
 		mLastVel(0),
 		mLastMs(hw::clock::getMsTick())
 	{
@@ -32,8 +32,8 @@ public:
 				{-0.0013495, 1901}
 		}; 
 		
-		mParams.factor.mValue = initLimits[index][0];
-		mParams.offset.mValue = initLimits[index][1];
+		mParams.factor.mValue = initLimits[jointIndex][0];
+		mParams.offset.mValue = initLimits[jointIndex][1];
 	}
 	
 	inline JointState observeJointState() {

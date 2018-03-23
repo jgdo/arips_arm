@@ -31,18 +31,21 @@ void MotionManager::stop() {
 	mCurrentState = BREAK;
 	mControlCycleCount = 0;
 	mArmHardware->breakMotors();
+	mJointController->reset();
 }
 
 void MotionManager::release() {
 	mCurrentState = IDLE;
 	mControlCycleCount = 0;
 	mArmHardware->releaseMotors();
+	mJointController->reset();
 }
 
 void MotionManager::enterRawMode() {
 	mCurrentState = RAW_MOTORS;
 	mRawJointPowers.fill(0);
 	mArmHardware->setRawMotorPowers(mRawJointPowers);
+	mJointController->reset();
 }
 
 void path::MotionManager::enterDirectJointsMode() {
@@ -88,7 +91,7 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 		
 	case RAW_MOTORS:
 		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-			jointStates.at(i).torque = 0;
+			jointStates.at(i).torque = mRawJointPowers.at(i);
 			jointStates.at(i).setpoint_pos = lastJointStates.at(i).motionState[0];
 			jointStates.at(i).setpoint_vel = lastJointStates.at(i).motionState[1];
 		}

@@ -18,6 +18,10 @@ void init() {
 	static Adafruit_MotorShield AFMS_L0(0x60);
 	static Adafruit_MotorShield AFMS_L1(0x61);
 
+	Wire1.begin();
+	AFMS_L0.begin();
+	AFMS_L1.begin();
+
 	static AdafruitV2Motor l0_m1("Level0_M1", AFMS_L0.getMotor(1));
 	static AdafruitV2Motor l0_m2("Level0_M1", AFMS_L0.getMotor(2));
 	static AdafruitV2Motor l0_m3("Level0_M1", AFMS_L0.getMotor(3));
