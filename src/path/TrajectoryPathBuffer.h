@@ -19,7 +19,7 @@ namespace path {
 
 class TrajectoryPathBuffer {
 public:
-	static const size_t TRAJECTORY_BUFFER_CAPACITY = 20;
+	static const size_t TRAJECTORY_BUFFER_CAPACITY = 32;
 	
 	enum PointState {
 		VALID, // point is valid
@@ -40,10 +40,11 @@ public:
 	/**
 	 * Add a point to end of trajectory buffer
 	 * 
+	 * @param index index offset from current trajectory point
 	 * @param point point to add to trajectory
-	 * @return True if point could be added, false if trajectory buffer is full.
+	 * @return True if point could be set, false if index is outside trajectory buffer limit.
 	 */
-	bool addTrajectoryPoint(const arips_arm_msgs::TrajectoryPoint& point);
+	bool setTrajectoryPoint(size_t index, const arips_arm_msgs::TrajectoryPoint& point);
 		
 	/**
 	 * Get next trajectory setpoint.

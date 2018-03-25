@@ -22,26 +22,26 @@ void TrajectoryPathBuffer::newTrajectory(size_t trajectorySize) {
 	mRemainingTrajectorySize = trajectorySize;
 }
 
-bool TrajectoryPathBuffer::addTrajectoryPoint(const arips_arm_msgs::TrajectoryPoint& point) {
-	uint32_t nextEnd = nextIndex(mBufferEnd);
-	if (nextEnd == mBufferStart) {
-		return false;
-	}
-	
-	mTrajectoryBuffer[mBufferEnd] = point;
-	mBufferEnd = nextEnd;
+bool TrajectoryPathBuffer::setTrajectoryPoint(size_t index, const arips_arm_msgs::TrajectoryPoint& point) {
+    if(index >= mTrajectoryBuffer.size()-1)
+        return false;
+
+    int offset = (mBufferStart + index) % mTrajectoryBuffer.size();
+    mTrajectoryBuffer.at(offset) = point;
+    mBufferEnd = (offset+1) % mTrajectoryBuffer.size();
 	return true;
 }
 
 TrajectoryPathBuffer::PointState TrajectoryPathBuffer::getNextSetpoint(robot::JointMotionStates* setpoint) {
+    // printf("%d\n", mRemainingTrajectorySize);
 	if (mRemainingTrajectorySize <= 0) {
 		return FINISHED;
 	}
 	if (getCurrentBufferSize()) {
 		for(size_t i = 0; i < NUM_JOINTS; i++) {
 			// TODO use .at(i)
-			setpoint->at(i)[0] = mTrajectoryBuffer[mBufferStart].goals[i].position;
-			setpoint->at(i)[1] = mTrajectoryBuffer[mBufferStart].goals[i].velocity;
+			setpoint->at(i)[0] = mTrajectoryBuffer.at(mBufferStart).goals[i].position;
+			setpoint->at(i)[1] = mTrajectoryBuffer.at(mBufferStart).goals[i].velocity;
 		}
 		
 		mBufferStart = nextIndex(mBufferStart);

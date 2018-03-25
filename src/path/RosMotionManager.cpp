@@ -81,19 +81,16 @@ void RosMotionManager::onTrajectoryBuffCb(const arips_arm_msgs::TrajectoryBuffer
 	if (msg.start_index > mMotionManager.getControlCycleCount()) {
 		return; // error: skipped points
 	} else {
-		size_t start_index = 0;
-		
 		if (msg.start_index == 0) {
-			start_index = 0;
 			buf.newTrajectory(msg.size);
-		} else {
-			start_index = mMotionManager.getControlCycleCount() - msg.start_index;
 		}
 		
+		int skip = mMotionManager.getControlCycleCount() - msg.start_index;
+
 		// TODO .size()
-		for (size_t i = start_index; i < std::min<size_t>(msg.size, sizeof(msg.traj_points)/sizeof(*msg.traj_points)); i++) {
+		for (size_t i = skip; i < std::min<size_t>(msg.size, sizeof(msg.traj_points)/sizeof(*msg.traj_points)); i++) {
 			// TODO .at(i)
-			if (!buf.addTrajectoryPoint(msg.traj_points[i])) {
+			if (!buf.setTrajectoryPoint(i - skip, msg.traj_points[i])) {
 				break; // buffer is full
 			}
 		}
