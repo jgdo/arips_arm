@@ -55,7 +55,8 @@ void init() {
 }
 
 float adc::getChannel(size_t channel) {
-	return (analogRead(channel) + analogRead(channel) + analogRead(channel) + analogRead(channel)) / 4.0f;
+    analogRead(channel);
+	return (analogRead(channel)+ analogRead(channel) + analogRead(channel) + analogRead(channel)) / 4.0f;
 }
 
 uint32_t clock::getMsTick() {
