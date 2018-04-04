@@ -14,8 +14,6 @@ namespace arips_arm_msgs
     public:
       typedef uint8_t _command_type;
       _command_type command;
-      typedef float _st_position_type;
-      _st_position_type st_position;
       enum { CMD_RELEASE =  5	 };
       enum { CMD_BREAK =  10	 };
       enum { CMD_HOLD =  15		 };
@@ -25,8 +23,7 @@ namespace arips_arm_msgs
       enum { CMD_START_TRAJECTORY =  30	 };
 
     MotionCommand():
-      command(0),
-      st_position(0)
+      command(0)
     {
     }
 
@@ -35,16 +32,6 @@ namespace arips_arm_msgs
       int offset = 0;
       *(outbuffer + offset + 0) = (this->command >> (8 * 0)) & 0xFF;
       offset += sizeof(this->command);
-      union {
-        float real;
-        uint32_t base;
-      } u_st_position;
-      u_st_position.real = this->st_position;
-      *(outbuffer + offset + 0) = (u_st_position.base >> (8 * 0)) & 0xFF;
-      *(outbuffer + offset + 1) = (u_st_position.base >> (8 * 1)) & 0xFF;
-      *(outbuffer + offset + 2) = (u_st_position.base >> (8 * 2)) & 0xFF;
-      *(outbuffer + offset + 3) = (u_st_position.base >> (8 * 3)) & 0xFF;
-      offset += sizeof(this->st_position);
       return offset;
     }
 
@@ -53,22 +40,11 @@ namespace arips_arm_msgs
       int offset = 0;
       this->command =  ((uint8_t) (*(inbuffer + offset)));
       offset += sizeof(this->command);
-      union {
-        float real;
-        uint32_t base;
-      } u_st_position;
-      u_st_position.base = 0;
-      u_st_position.base |= ((uint32_t) (*(inbuffer + offset + 0))) << (8 * 0);
-      u_st_position.base |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
-      u_st_position.base |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
-      u_st_position.base |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
-      this->st_position = u_st_position.real;
-      offset += sizeof(this->st_position);
      return offset;
     }
 
     const char * getType(){ return "arips_arm_msgs/MotionCommand"; };
-    const char * getMD5(){ return "349ff2d00106b157db750ee85773799c"; };
+    const char * getMD5(){ return "d6f4b0a03e2f977f0a6a8d4a298bb2d5"; };
 
   };
 

@@ -13,7 +13,7 @@ namespace arips_arm_msgs
   class TrajectoryPoint : public ros::Msg
   {
     public:
-      arips_arm_msgs::JointGoal goals[5];
+      arips_arm_msgs::JointGoal goals[6];
 
     TrajectoryPoint():
       goals()
@@ -23,7 +23,7 @@ namespace arips_arm_msgs
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      for( uint32_t i = 0; i < 5; i++){
+      for( uint32_t i = 0; i < 6; i++){
       offset += this->goals[i].serialize(outbuffer + offset);
       }
       return offset;
@@ -32,7 +32,7 @@ namespace arips_arm_msgs
     virtual int deserialize(unsigned char *inbuffer)
     {
       int offset = 0;
-      for( uint32_t i = 0; i < 5; i++){
+      for( uint32_t i = 0; i < 6; i++){
       offset += this->goals[i].deserialize(inbuffer + offset);
       }
      return offset;

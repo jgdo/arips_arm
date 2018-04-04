@@ -12,7 +12,7 @@ namespace arips_arm_msgs
   class RawMotorCommand : public ros::Msg
   {
     public:
-      float raw_motor_power[5];
+      float raw_motor_power[6];
 
     RawMotorCommand():
       raw_motor_power()
@@ -22,7 +22,7 @@ namespace arips_arm_msgs
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      for( uint32_t i = 0; i < 5; i++){
+      for( uint32_t i = 0; i < 6; i++){
       union {
         float real;
         uint32_t base;
@@ -40,7 +40,7 @@ namespace arips_arm_msgs
     virtual int deserialize(unsigned char *inbuffer)
     {
       int offset = 0;
-      for( uint32_t i = 0; i < 5; i++){
+      for( uint32_t i = 0; i < 6; i++){
       union {
         float real;
         uint32_t base;
@@ -57,7 +57,7 @@ namespace arips_arm_msgs
     }
 
     const char * getType(){ return "arips_arm_msgs/RawMotorCommand"; };
-    const char * getMD5(){ return "b54b3eaf4bcd0b062aa354b1a0135ad0"; };
+    const char * getMD5(){ return "610f6921122932c6a64d5815d5ec98b9"; };
 
   };
 

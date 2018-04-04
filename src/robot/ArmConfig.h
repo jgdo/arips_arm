@@ -17,7 +17,7 @@
 namespace robot {
 
 namespace ArmConfig {
-	static constexpr uint32_t NUM_JOINTS = 5;
+	static constexpr uint32_t NUM_JOINTS = 6;
 	static constexpr uint32_t CONTROL_PERIOD_MS = 10;
 	static constexpr float CONTROL_PERIOD_S = CONTROL_PERIOD_MS * 0.001F;
 }

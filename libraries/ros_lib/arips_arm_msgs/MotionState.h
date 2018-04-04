@@ -19,7 +19,7 @@ namespace arips_arm_msgs
       _mode_type mode;
       typedef ros::Time _stamp_type;
       _stamp_type stamp;
-      arips_arm_msgs::JointState jointStates[5];
+      arips_arm_msgs::JointState jointStates[6];
       typedef arips_arm_msgs::TrajectoryState _trajState_type;
       _trajState_type trajState;
       enum { M_IDLE =  0  };
@@ -56,7 +56,7 @@ namespace arips_arm_msgs
       *(outbuffer + offset + 2) = (this->stamp.nsec >> (8 * 2)) & 0xFF;
       *(outbuffer + offset + 3) = (this->stamp.nsec >> (8 * 3)) & 0xFF;
       offset += sizeof(this->stamp.nsec);
-      for( uint32_t i = 0; i < 5; i++){
+      for( uint32_t i = 0; i < 6; i++){
       offset += this->jointStates[i].serialize(outbuffer + offset);
       }
       offset += this->trajState.serialize(outbuffer + offset);
@@ -81,7 +81,7 @@ namespace arips_arm_msgs
       this->stamp.nsec |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
       this->stamp.nsec |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
       offset += sizeof(this->stamp.nsec);
-      for( uint32_t i = 0; i < 5; i++){
+      for( uint32_t i = 0; i < 6; i++){
       offset += this->jointStates[i].deserialize(inbuffer + offset);
       }
       offset += this->trajState.deserialize(inbuffer + offset);

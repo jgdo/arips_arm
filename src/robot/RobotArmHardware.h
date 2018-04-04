@@ -25,8 +25,8 @@ typedef std::array<JointState, ArmConfig::NUM_JOINTS> JointStates;
 class RobotArmHardware {
 public:
 	RobotArmHardware(const RobotModel& model,
-									 std::array<hw::Actuator*, ArmConfig::NUM_JOINTS> const& actuators,
-			 	 	 	 	 	   std::array<JointStateObserver*, ArmConfig::NUM_JOINTS> const& observers);
+					std::array<hw::Actuator*, ArmConfig::NUM_JOINTS> const& actuators,
+			 	 	std::array<JointStateObserver*, ArmConfig::NUM_JOINTS> const& observers);
 	/**
 	 * Shortcut all motors to create a breaking effect.
 	 */

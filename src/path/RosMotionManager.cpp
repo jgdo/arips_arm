@@ -11,6 +11,15 @@ using namespace robot::ArmConfig;
 
 namespace path {
 
+static_assert(sizeof(arips_arm_msgs::MotionState::jointStates)/sizeof(arips_arm_msgs::JointState) == NUM_JOINTS,
+        "Declared number of joints is different than in message");
+
+static_assert(sizeof(arips_arm_msgs::RawMotorCommand::raw_motor_power)/sizeof(float) == NUM_JOINTS,
+        "Declared number of joints is different than in message");
+
+static_assert(sizeof(arips_arm_msgs::TrajectoryPoint::goals)/sizeof(arips_arm_msgs::JointGoal) == NUM_JOINTS,
+        "Declared number of joints is different than in message");
+
 RosMotionManager::RosMotionManager(robot::RobotArmController* controller, robot::RobotArmHardware* arm) :
 		mMotionManager(controller, arm), mMotionCmdSub("motion_command", &RosMotionManager::onMotionCommandCb, this), mTrajBuffSub(
 				"traj_buffer_command", &RosMotionManager::onTrajectoryBuffCb, this), mRawMotorSub("raw_motor_command",

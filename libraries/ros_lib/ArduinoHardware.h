@@ -53,11 +53,9 @@ public:
 	int read() {
 		return SerialUSB.read();
 	}
-	;
 
 	void write(uint8_t* data, int length) {
-		for (int i = 0; i < length; i++)
-			SerialUSB.write(data[i]);
+		SerialUSB.write(data, length);
 	}
 
 	unsigned long time() {
@@ -66,3 +64,4 @@ public:
 };
 
 #endif
+

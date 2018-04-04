@@ -33,8 +33,6 @@ using namespace robot;
 std_msgs::String str_msg;
 ros::Publisher chatter("chatter", &str_msg);
 
-char hello[13] = "hello world!";
-
 void setup() {
 	hw::init();
 
@@ -46,23 +44,26 @@ void setup() {
 
 void loop() {
 	RobotModel model;
-	JointStateObserver jso[ArmConfig::NUM_JOINTS] = { {0, ADC6, "joint0_observer"} , {1, ADC7, "joint1_observer"}, {2, ADC8, "joint2_observer"}, {3, ADC9, "joint3_observer"}, {4, ADC10, "joint4_observer"} };
+	JointStateObserver jso[ArmConfig::NUM_JOINTS] = { {0, ADC6, "joint0_observer"} , {1, ADC7, "joint1_observer"}, {2, ADC8, "joint2_observer"}, {3, ADC9, "joint3_observer"}, {4, ADC10, "joint4_observer"}, {5, ADC11, "gripper_observer"} };
 	RobotArmHardware armHw(model, { hw::actuator::adafruitV2MotorL1_M1,
 									hw::actuator::adafruitV2MotorL1_M2,
 									hw::actuator::adafruitV2MotorL1_M3,
 									hw::actuator::adafruitV2MotorL1_M4,
-									hw::actuator::adafruitV2MotorL0_M1},
-								  { jso + 0, jso + 1, jso + 2, jso + 3, jso + 4 });
+									hw::actuator::adafruitV2MotorL0_M1,
+									hw::actuator::adafruitV2MotorL0_M2},
+								  { jso + 0, jso + 1, jso + 2, jso + 3, jso + 4 , jso+5});
 
 	ctrl::VelocityPIDController pid[ArmConfig::NUM_JOINTS] =  {
 			{"pid_0", -0.7, 0.7},
 			{"pid_1", -0.7, 0.7},
 			{"pid_2", -0.7, 0.7},
 			{"pid_3", -0.7, 0.7},
-			{"pid_4", -0.7, 0.7}
+			{"pid_4", -0.7, 0.7},
+			{"pid_gripper", -0.7, 0.7}
 	};
 
 	static const float pidParams[ArmConfig::NUM_JOINTS][3] = {
+			{0.5, 0.02, 0.0},
 			{0.5, 0.02, 0.0},
 			{0.5, 0.02, 0.0},
 			{0.5, 0.02, 0.0},
@@ -76,13 +77,11 @@ void loop() {
 		pid[i].params.D.mValue = pidParams[i][2];
 	}
 
-	ctrl::IndividualGroupController<Vec2f, ArmConfig::NUM_JOINTS> controller({pid+0, pid+1, pid+2, pid+3, pid+4});
+	ctrl::IndividualGroupController<Vec2f, ArmConfig::NUM_JOINTS> controller({pid+0, pid+1, pid+2, pid+3, pid+4, pid+5});
 
 	path::RosMotionManager motionMan(&controller, &armHw);
 
 	auto handle = SysTickTimer::createTimer(ArmConfig::CONTROL_PERIOD_MS, [&]() {
-		str_msg.data = hello;
-		chatter.publish(&str_msg);
 		motionMan.onControlTick();
 	});
 

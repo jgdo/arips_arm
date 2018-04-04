@@ -24,12 +24,13 @@ public:
 		mLastVel(0),
 		mLastMs(hw::clock::getMsTick())
 	{
-		static const float initLimits[5][2] = {
+		static const float initLimits[6][2] = {
 				{-0.0008650, 1829},
 				{-0.0011508, 1923},
-				{-0.0012900, 1969},
+				{-0.0012900, 2401},
 				{-0.0009251, 2040},
-				{-0.0013495, 1901}
+				{-0.0013495, 1901},
+				{-0.00032, 2550}
 		}; 
 		
 		mParams.factor.mValue = initLimits[jointIndex][0];

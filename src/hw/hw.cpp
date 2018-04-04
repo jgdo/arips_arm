@@ -9,6 +9,9 @@
 #include <hw/AdafruitV2Motor.h>
 
 #include <Arduino.h>
+#include <Servo.h>
+
+#include <stdexcept>
 
 namespace hw {
 
@@ -52,6 +55,9 @@ void init() {
 	actuator::adafruitV2MotorL1_M2 = &l1_m2;
 	actuator::adafruitV2MotorL1_M3 = &l1_m3;
 	actuator::adafruitV2MotorL1_M4 = &l1_m4;
+
+	Serial.begin(115200);
+	Serial.println("Init done.");
 }
 
 float adc::getChannel(size_t channel) {

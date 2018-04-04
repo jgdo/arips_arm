@@ -44,7 +44,7 @@ bool RobotArmHardware::limitJointPower(size_t i, JointPowers::value_type& power)
 }
 
 void RobotArmHardware::setJointPowers(JointPowers& powers) {
-	static_assert(ArmConfig::NUM_JOINTS == 5, "This RobotArmHardware specialized on a 5 DOF robot");
+	static_assert(ArmConfig::NUM_JOINTS == 6, "This RobotArmHardware specialized on a 5 DOF + gripper robot");
 	
 	for (size_t i = 0; i < 3; i++) {
 		if(limitJointPower(i, powers.at(i))) {
@@ -66,6 +66,12 @@ void RobotArmHardware::setJointPowers(JointPowers& powers) {
 		mActuators.at(3)->doBreak();
 		mActuators.at(4)->doBreak();
 	}
+
+	if(limitJointPower(5, powers.at(5))) {
+        mActuators.at(5)->apply(powers.at(5));
+    } else {
+        mActuators.at(5)->doBreak();
+    }
 }
 
 void RobotArmHardware::readJointStates() {
