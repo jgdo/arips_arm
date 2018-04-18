@@ -46,7 +46,8 @@ namespace tf
     public:
       TransformBroadcaster() : publisher_("/tf", &internal_msg) {}
 
-      void init(ros::NodeHandle &nh)
+      template<class NH>
+      void init(NH &nh)
       {
         nh.advertise(publisher_);
       }

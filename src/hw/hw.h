@@ -10,6 +10,8 @@
 
 #include "Actuator.hpp"
 
+#include "MD25Motors.h"
+
 #include <cstdint>
 #include <cstddef>
 
@@ -26,6 +28,8 @@ namespace actuator {
 	extern Actuator* adafruitV2MotorL1_M2;
 	extern Actuator* adafruitV2MotorL1_M3;
 	extern Actuator* adafruitV2MotorL1_M4;
+
+	extern MD25Motors md25Motors;
 }
 
 namespace adc {

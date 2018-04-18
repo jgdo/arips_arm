@@ -15,8 +15,14 @@ RM := rm -f
 -include src/path/subdir.mk
 -include src/hw/subdir.mk
 -include src/control/subdir.mk
+-include src/arips/subdir.mk
 -include libraries/ros_lib/subdir.mk
 -include libraries/Wire/src/subdir.mk
+-include libraries/Servo/src/stm32f4/subdir.mk
+-include libraries/Servo/src/samd/subdir.mk
+-include libraries/Servo/src/sam/subdir.mk
+-include libraries/Servo/src/nrf52/subdir.mk
+-include libraries/Servo/src/avr/subdir.mk
 -include libraries/Adafruit_Motor_Shield_V2_Library/utility/subdir.mk
 -include libraries/Adafruit_Motor_Shield_V2_Library/subdir.mk
 -include core/variant/subdir.mk

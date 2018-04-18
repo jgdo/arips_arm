@@ -5,6 +5,7 @@ src/path/MotionManager.cpp.o: ../src/path/MotionManager.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/control/Controller.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/path/SingleTargetPathProvider.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/vecdef.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/Eigen/Dense \
@@ -354,6 +355,8 @@ src/path/MotionManager.cpp.o: ../src/path/MotionManager.cpp \
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/path/SingleTargetPathProvider.h:
 

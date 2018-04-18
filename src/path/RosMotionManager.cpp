@@ -58,7 +58,7 @@ void RosMotionManager::onControlTick() {
 
 	// TODO: call directly
 	MotionManager::JointStatesMsg jsm;
-	std::copy(std::begin(mMotionStateMsg.jointStates), std::end(mMotionStateMsg.jointStates), std::begin(jsm));
+	// std::copy(std::begin(mMotionStateMsg.jointStates), std::end(mMotionStateMsg.jointStates), std::begin(jsm));
 	mMotionManager.onControlTick(jsm);
 	std::copy(std::begin(jsm), std::end(jsm), std::begin(mMotionStateMsg.jointStates));
 

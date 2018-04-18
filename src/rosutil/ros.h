@@ -12,7 +12,7 @@
 #include <rosutil/RobotRosHardware.h>
 
 namespace ros {
-extern NodeHandle_<::rosutl::RobotRosHardware, 25, 25, 2048, 512> nh;
+extern NodeHandle_<::rosutl::RobotRosHardware, 25, 25, 2048, 1024> nh;
 }
 
 

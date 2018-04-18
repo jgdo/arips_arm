@@ -56,6 +56,8 @@ void init() {
 	actuator::adafruitV2MotorL1_M3 = &l1_m3;
 	actuator::adafruitV2MotorL1_M4 = &l1_m4;
 
+	actuator::md25Motors.init();
+
 	Serial.begin(115200);
 	Serial.println("Init done.");
 }
@@ -78,6 +80,8 @@ Actuator* adafruitV2MotorL1_M1;
 Actuator* adafruitV2MotorL1_M2;
 Actuator* adafruitV2MotorL1_M3;
 Actuator* adafruitV2MotorL1_M4;
+
+MD25Motors md25Motors;
 }
 
 } /* namespace hw */

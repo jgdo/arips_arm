@@ -21,6 +21,8 @@
 
 #include <path/RosMotionManager.h>
 
+#include <arips/AripsHardware.h>
+
 #include <utl/Timer.h>
 
 #include <hw/hw.h>
@@ -81,8 +83,17 @@ void loop() {
 
 	path::RosMotionManager motionMan(&controller, &armHw);
 
+	arips::AripsHardware theArips;
+
 	auto handle = SysTickTimer::createTimer(ArmConfig::CONTROL_PERIOD_MS, [&]() {
+	    static char buf[50];
+	    uint32_t start = hw::clock::getMsTick();
 		motionMan.onControlTick();
+
+		uint32_t dt = hw::clock::getMsTick() - start;
+
+		//sprintf(buf, "motion tick dt = %d", dt);
+		//nh.loginfo(buf);
 	});
 
 	while (true) {

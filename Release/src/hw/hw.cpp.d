@@ -1,6 +1,7 @@
 src/hw/hw.cpp.o: ../src/hw/hw.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/AdafruitV2Motor.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
  /home/jgdo/Arduino/libraries/Adafruit_Motor_Shield_V2_Library/Adafruit_MotorShield.h \
@@ -142,11 +143,15 @@ src/hw/hw.cpp.o: ../src/hw/hw.cpp \
  /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/USARTClass.h \
  /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/UARTClass.h \
  /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/syscalls.h \
- /home/jgdo/Arduino/libraries/Adafruit_Motor_Shield_V2_Library/utility/Adafruit_MS_PWMServoDriver.h
+ /home/jgdo/Arduino/libraries/Adafruit_Motor_Shield_V2_Library/utility/Adafruit_MS_PWMServoDriver.h \
+ /home/jgdo/tools/sloeber/arduinoPlugin/libraries/Servo/1.1.2/src/Servo.h \
+ /home/jgdo/tools/sloeber/arduinoPlugin/libraries/Servo/1.1.2/src/sam/ServoTimers.h
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/AdafruitV2Motor.h:
 
@@ -431,3 +436,7 @@ src/hw/hw.cpp.o: ../src/hw/hw.cpp \
 /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/syscalls.h:
 
 /home/jgdo/Arduino/libraries/Adafruit_Motor_Shield_V2_Library/utility/Adafruit_MS_PWMServoDriver.h:
+
+/home/jgdo/tools/sloeber/arduinoPlugin/libraries/Servo/1.1.2/src/Servo.h:
+
+/home/jgdo/tools/sloeber/arduinoPlugin/libraries/Servo/1.1.2/src/sam/ServoTimers.h:

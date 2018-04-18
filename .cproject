@@ -28,6 +28,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Adafruit_Motor_Shield_V2_Library/utility}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Wire/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Servo}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Servo/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1189721048" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -39,6 +41,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Adafruit_Motor_Shield_V2_Library/utility}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Wire/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Servo}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Servo/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.304504940" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -50,6 +54,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Adafruit_Motor_Shield_V2_Library/utility}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Wire/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Servo}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arips_arm_firmware/libraries/Servo/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1920104640" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

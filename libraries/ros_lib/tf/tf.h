@@ -50,6 +50,38 @@ namespace tf
     return q;
   }
 
+  inline geometry_msgs::Quaternion createQuaternionFromRPY(double r, double p, double y) {
+      geometry_msgs::Quaternion quat;
+
+      r /= 2.0;
+      p /= 2.0;
+      y /= 2.0;
+      double ci = cos(r);
+      double si = sin(r);
+      double cj = cos(p);
+      double sj = sin(p);
+      double ck = cos(y);
+      double sk = sin(y);
+      double cc = ci * ck;
+      double cs = ci * sk;
+      double sc = si * ck;
+      double ss = si * sk;
+
+      //   if repetition:
+      //  quat.x = cj * (cs + sc);
+      //  quat.y = sj * (cc + ss);
+      //  quat.z = sj * (cs - sc);
+      //  quat.w = cj * (cc - ss);
+      /// else:
+      quat.x = cj * sc - sj * cs;
+      quat.y = cj * ss + sj * cc;
+      quat.z = cj * cs - sj * sc;
+      quat.w = cj * cc + sj * ss;
+      //      if parity:
+      //          quaternion[j] *= -1
+
+      return quat;
+  }
 }
 
 #endif

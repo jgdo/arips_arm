@@ -41,8 +41,14 @@ core/core/avr \
 core/variant \
 libraries/Adafruit_Motor_Shield_V2_Library \
 libraries/Adafruit_Motor_Shield_V2_Library/utility \
+libraries/Servo/src/avr \
+libraries/Servo/src/nrf52 \
+libraries/Servo/src/sam \
+libraries/Servo/src/samd \
+libraries/Servo/src/stm32f4 \
 libraries/Wire/src \
 libraries/ros_lib \
+src/arips \
 src/control \
 src/hw \
 src/path \

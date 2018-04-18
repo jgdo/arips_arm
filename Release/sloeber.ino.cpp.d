@@ -340,6 +340,7 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointStateObserver.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/ArmConfig.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/RobotArmHardware.h \
@@ -359,6 +360,20 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/TrajectoryState.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/TrajectoryBufferCommand.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/RawMotorCommand.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/arips/AripsHardware.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tf/transform_broadcaster.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tf/tfMessage.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/TransformStamped.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Header.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Transform.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Vector3.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Quaternion.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/nav_msgs/Odometry.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/PoseWithCovariance.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Pose.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Point.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/TwistWithCovariance.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Twist.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Timer.h \
  ../arips_arm_firmware.ino
 
@@ -1044,6 +1059,8 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp:
 
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
+
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/ArmConfig.h:
@@ -1081,6 +1098,34 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/TrajectoryBufferCommand.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/RawMotorCommand.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/arips/AripsHardware.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tf/transform_broadcaster.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tf/tfMessage.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/TransformStamped.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Header.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Transform.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Vector3.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Quaternion.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/nav_msgs/Odometry.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/PoseWithCovariance.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Pose.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Point.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/TwistWithCovariance.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Twist.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Timer.h:
 
