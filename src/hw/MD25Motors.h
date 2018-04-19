@@ -20,7 +20,9 @@ public:
 
     void setSpeedLeftRight(float left, float right);
 
-    int readDistance(int32_t *left, int32_t *right);
+    void requestDistance();
+
+    int tryReadDistance(int32_t *left, int32_t *right);
 
     int resetEncoder();
 
@@ -33,6 +35,8 @@ protected:
 
 private:
     int speed[2] = { 128, 128 };
+
+    uint32_t mLastOdomotryRequestMs;
 };
 
 } /* namespace hw */

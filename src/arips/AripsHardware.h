@@ -19,14 +19,14 @@ class AripsHardware {
 public:
     AripsHardware();
 
-    void sendOdometryTF();
 public:
     tf::TransformBroadcaster broadcaster;
 
     long long currentDrivenDistLeft = 0, currentDrivenDistRight = 0;
     double currentPosX = 0, currentPosY = 0, currentAngle = 0;
 
-    SysTickTimerHandle timer;
+    SysTickTimerHandle mCheckOdometryTimer;
+    SysTickTimerHandle mRequestOdometryTimer;
 
     ros::Time lastTime;
 
@@ -36,6 +36,10 @@ public:
     ros::Subscriber<geometry_msgs::Twist, AripsHardware> mCmdVelSub;
 
     void cmdVelCB(const geometry_msgs::Twist& msg);
+
+    void requestOdometryTF();
+
+    void checkSendOdometryTF();
 };
 
 } /* namespace arips */

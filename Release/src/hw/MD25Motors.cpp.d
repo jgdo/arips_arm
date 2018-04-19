@@ -1,5 +1,8 @@
 src/hw/MD25Motors.cpp.o: ../src/hw/MD25Motors.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/Arduino.h \
  /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/avr/pgmspace.h \
  /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/avr/interrupt.h \
@@ -135,6 +138,12 @@ src/hw/MD25Motors.cpp.o: ../src/hw/MD25Motors.cpp \
  /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/USB/USBAPI.h \
  /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/RingBuffer.h \
  /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/Stream.h
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
 

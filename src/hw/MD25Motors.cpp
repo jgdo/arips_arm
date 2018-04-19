@@ -6,6 +6,7 @@
  */
 
 #include <hw/MD25Motors.h>
+#include <hw/hw.h>
 
 #include <Arduino.h>
 
@@ -32,6 +33,8 @@ namespace hw {
 
 #define MD25_CMD_RESET_ENCODERS     0x20
 
+#define MD25_ODOMTERY_TIMEOUT_MS    10
+
 void MD25Motors::init() {
     Serial3.begin(38400, UARTClass::MODE_8N2);
 
@@ -57,10 +60,14 @@ void MD25Motors::setSpeedLeftRight(float left, float right) {
     sendI2CSpeedCommand();
 }
 
-int MD25Motors::readDistance(int32_t * left, int32_t * right) {
+void MD25Motors::requestDistance() {
     uint8_t writebuf[] = {0, 0x25};
     Serial3.write(writebuf, sizeof(writebuf));
 
+    mLastOdomotryRequestMs = hw::clock::getMsTick();
+}
+
+int MD25Motors::tryReadDistance(int32_t * left, int32_t * right) {
    if(Serial3.available() >= 8) {
        uint8_t buf[8];
        Serial3.readBytes(buf, sizeof(buf));
@@ -69,6 +76,13 @@ int MD25Motors::readDistance(int32_t * left, int32_t * right) {
        *right = (buf[4] << 24) | (buf[5] << 16) | (buf[6] << 8) | (buf[7] << 0);
        return 0;
    } else {
+       // clear any bytes in buffer if timed out
+       if(hw::clock::getMsTick() - mLastOdomotryRequestMs > MD25_ODOMTERY_TIMEOUT_MS) {
+           while(Serial3.available() > 0) {
+               Serial3.read();
+           }
+       }
+
        return -1;
    }
 
@@ -132,3 +146,5 @@ void MD25Motors::sendI2CSpeedCommand() {
 }
 
 } /* namespace hw */
+
+
