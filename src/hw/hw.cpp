@@ -15,6 +15,13 @@
 
 namespace hw {
 
+struct ArduinoServo: public Servo, public ::Servo {
+    virtual void setDegrees(float degrees) override {
+        write(degrees);
+    }
+};
+
+
 void init() {
 	analogReadResolution(12);
 
@@ -58,6 +65,12 @@ void init() {
 
 	actuator::md25Motors.init();
 
+	static ArduinoServo servoP9;
+
+	servoP9.attach(9);
+	servoP9.setDegrees(90);
+	servo::servoPin9 = &servoP9;
+
 	Serial.begin(115200);
 	Serial.println("Init done.");
 }
@@ -82,6 +95,10 @@ Actuator* adafruitV2MotorL1_M3;
 Actuator* adafruitV2MotorL1_M4;
 
 MD25Motors md25Motors;
+}
+
+namespace servo {
+Servo* servoPin9;
 }
 
 } /* namespace hw */

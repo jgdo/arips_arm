@@ -9,7 +9,7 @@
 #define HW_HW_H_
 
 #include "Actuator.hpp"
-
+#include "Servo.h"
 #include "MD25Motors.h"
 
 #include <cstdint>
@@ -30,6 +30,10 @@ namespace actuator {
 	extern Actuator* adafruitV2MotorL1_M4;
 
 	extern MD25Motors md25Motors;
+}
+
+namespace servo {
+    extern Servo* servoPin9;
 }
 
 namespace adc {

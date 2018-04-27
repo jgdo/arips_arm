@@ -10,6 +10,7 @@
 
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
+#include <std_msgs/Float32.h>
 
 #include <utl/Timer.h>
 
@@ -35,11 +36,15 @@ public:
 
     ros::Subscriber<geometry_msgs::Twist, AripsHardware> mCmdVelSub;
 
+    ros::Subscriber<std_msgs::Float32, AripsHardware> mKinectTiltSub;
+
     void cmdVelCB(const geometry_msgs::Twist& msg);
 
     void requestOdometryTF();
 
     void checkSendOdometryTF();
+
+    void kinectTiltCb(const std_msgs::Float32& msg);
 };
 
 } /* namespace arips */

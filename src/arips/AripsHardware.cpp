@@ -21,12 +21,16 @@ static constexpr double ARIPS_WHEEL_DIST = 0.325; // TODO
 namespace arips {
 
 AripsHardware::AripsHardware() :
-        lastTime(ros::nh.now()), odom_pub("/odom", &odom_msg), mCmdVelSub("/cmd_vel", &AripsHardware::cmdVelCB, this) {
+        lastTime(ros::nh.now()), odom_pub("/odom", &odom_msg),
+        mCmdVelSub("/cmd_vel", &AripsHardware::cmdVelCB, this),
+        mKinectTiltSub("/kinect_tilt", &AripsHardware::kinectTiltCb, this)
+{
     broadcaster.init(ros::nh);
 
     ros::nh.advertise(odom_pub);
 
     ros::nh.subscribe(mCmdVelSub);
+    ros::nh.subscribe(mKinectTiltSub);
 
     mCheckOdometryTimer = SysTickTimer::createTimer(1, [&]() {
         this->checkSendOdometryTF();
@@ -156,6 +160,10 @@ void AripsHardware::cmdVelCB(const geometry_msgs::Twist& msg) {
 
     hw::actuator::md25Motors.setSpeedLeftRight(left, right);
 
+}
+
+void AripsHardware::kinectTiltCb(const std_msgs::Float32& msg) {
+    hw::servo::servoPin9->setDegrees(msg.data);
 }
 
 } /* namespace arips */
