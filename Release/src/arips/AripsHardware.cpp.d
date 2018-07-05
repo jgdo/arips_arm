@@ -163,12 +163,19 @@ src/arips/AripsHardware.cpp.o: ../src/arips/AripsHardware.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Point.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/TwistWithCovariance.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Twist.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Float32.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Timer.h \
- /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h \
- /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
- /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/rosutil/ParameterServer.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/rosutil/ros.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/rosutil/RobotRosHardware.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/GetDef.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/GroupDef.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/ParameterDef.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/SetParam.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tf/tf.h
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/arips/AripsHardware.h:
@@ -499,16 +506,30 @@ src/arips/AripsHardware.cpp.o: ../src/arips/AripsHardware.cpp \
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Twist.h:
 
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Float32.h:
+
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Timer.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/rosutil/ParameterServer.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/rosutil/ros.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/rosutil/RobotRosHardware.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/GetDef.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/GroupDef.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/ParameterDef.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/SetParam.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp:
 
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h:
+
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
-
-/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/rosutil/ros.h:
-
-/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/rosutil/RobotRosHardware.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tf/tf.h:

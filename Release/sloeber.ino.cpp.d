@@ -340,6 +340,7 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointStateObserver.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/ArmConfig.h \
@@ -374,6 +375,7 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Point.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/TwistWithCovariance.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Twist.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Float32.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Timer.h \
  ../arips_arm_firmware.ino
 
@@ -1059,6 +1061,8 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp:
 
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h:
+
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h:
@@ -1126,6 +1130,8 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/TwistWithCovariance.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Twist.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Float32.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Timer.h:
 

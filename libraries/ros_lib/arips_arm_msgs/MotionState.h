@@ -22,6 +22,8 @@ namespace arips_arm_msgs
       arips_arm_msgs::JointState jointStates[6];
       typedef arips_arm_msgs::TrajectoryState _trajState_type;
       _trajState_type trajState;
+      typedef float _controlLoopTime_type;
+      _controlLoopTime_type controlLoopTime;
       enum { M_IDLE =  0  };
       enum { M_BREAK =  10  };
       enum { M_HOLD =  15  };
@@ -34,7 +36,8 @@ namespace arips_arm_msgs
       mode(0),
       stamp(),
       jointStates(),
-      trajState()
+      trajState(),
+      controlLoopTime(0)
     {
     }
 
@@ -60,6 +63,16 @@ namespace arips_arm_msgs
       offset += this->jointStates[i].serialize(outbuffer + offset);
       }
       offset += this->trajState.serialize(outbuffer + offset);
+      union {
+        float real;
+        uint32_t base;
+      } u_controlLoopTime;
+      u_controlLoopTime.real = this->controlLoopTime;
+      *(outbuffer + offset + 0) = (u_controlLoopTime.base >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (u_controlLoopTime.base >> (8 * 1)) & 0xFF;
+      *(outbuffer + offset + 2) = (u_controlLoopTime.base >> (8 * 2)) & 0xFF;
+      *(outbuffer + offset + 3) = (u_controlLoopTime.base >> (8 * 3)) & 0xFF;
+      offset += sizeof(this->controlLoopTime);
       return offset;
     }
 
@@ -85,11 +98,22 @@ namespace arips_arm_msgs
       offset += this->jointStates[i].deserialize(inbuffer + offset);
       }
       offset += this->trajState.deserialize(inbuffer + offset);
+      union {
+        float real;
+        uint32_t base;
+      } u_controlLoopTime;
+      u_controlLoopTime.base = 0;
+      u_controlLoopTime.base |= ((uint32_t) (*(inbuffer + offset + 0))) << (8 * 0);
+      u_controlLoopTime.base |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
+      u_controlLoopTime.base |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
+      u_controlLoopTime.base |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
+      this->controlLoopTime = u_controlLoopTime.real;
+      offset += sizeof(this->controlLoopTime);
      return offset;
     }
 
     const char * getType(){ return "arips_arm_msgs/MotionState"; };
-    const char * getMD5(){ return "51af2809dfff7cd728b10d4e739018fe"; };
+    const char * getMD5(){ return "cf45d3bbeb06fc1be4368244996fddbc"; };
 
   };
 

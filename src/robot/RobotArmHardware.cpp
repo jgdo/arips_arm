@@ -67,7 +67,7 @@ void RobotArmHardware::setJointPowers(JointPowers& powers) {
 		mActuators.at(4)->doBreak();
 	}
 
-	if(limitJointPower(5, powers.at(5))) {
+	if(true || limitJointPower(5, powers.at(5))) {
         mActuators.at(5)->apply(powers.at(5));
     } else {
         mActuators.at(5)->doBreak();

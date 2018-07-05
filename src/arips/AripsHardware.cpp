@@ -12,6 +12,8 @@
 
 #include <tf/tf.h>
 
+#include <algorithm>
+
 static constexpr double ENCODER_FACTOR = 0.000863937;
 
 static constexpr double ARIPS_WHEEL_DIST = 0.325; // TODO
@@ -23,7 +25,7 @@ namespace arips {
 AripsHardware::AripsHardware() :
         lastTime(ros::nh.now()), odom_pub("/odom", &odom_msg),
         mCmdVelSub("/cmd_vel", &AripsHardware::cmdVelCB, this),
-        mKinectTiltSub("/kinect_tilt", &AripsHardware::kinectTiltCb, this)
+        mKinectTiltSub("/kinect_tilt_deg", &AripsHardware::kinectTiltCb, this)
 {
     broadcaster.init(ros::nh);
 
@@ -39,6 +41,8 @@ AripsHardware::AripsHardware() :
     mRequestOdometryTimer = SysTickTimer::createTimer(20, [&]() {
         this->requestOdometryTF();
     });
+
+    hw::servo::servoPin9->setDegrees(kinectAngle2Raw(currentKinectAngle));
 }
 
 void AripsHardware::requestOdometryTF() {
@@ -107,17 +111,30 @@ void AripsHardware::checkSendOdometryTF() {
 
     lastTime = nowTime;
 
-    // publish TF
     static geometry_msgs::TransformStamped t;
 
+    // publish odom tf
     t.header.frame_id = "/odom";
     t.header.stamp = nowTime;
-    t.child_frame_id = "/base_link";
+    t.child_frame_id = "/arips_base";
 
     t.transform.translation.x = currentPosX;
     t.transform.translation.y = currentPosY;
+    t.transform.translation.z = 0;
 
     t.transform.rotation = tf::createQuaternionFromRPY(0, 0, currentAngle);
+    broadcaster.sendTransform(t);
+
+    // publish kinect tf
+    t.header.frame_id = "/arips_base";
+    t.header.stamp = nowTime;
+    t.child_frame_id = "/kinect_base";
+
+    t.transform.translation.x = -0.125;
+    t.transform.translation.y = 0;
+    t.transform.translation.z = 0.72;
+
+    t.transform.rotation = tf::createQuaternionFromRPY(0, currentKinectAngle * 3.14159265358979323846f / 180.0f, 0);
     broadcaster.sendTransform(t);
 
     // Publish Odometry
@@ -159,11 +176,41 @@ void AripsHardware::cmdVelCB(const geometry_msgs::Twist& msg) {
     // ros::nh.loginfo("Setting motor speed.");
 
     hw::actuator::md25Motors.setSpeedLeftRight(left, right);
-
 }
 
 void AripsHardware::kinectTiltCb(const std_msgs::Float32& msg) {
-    hw::servo::servoPin9->setDegrees(msg.data);
+currentKinectAngle = std::clamp(msg.data, -30.0f, 40.0f);
+    hw::servo::servoPin9->setDegrees(kinectAngle2Raw(currentKinectAngle));
+}
+
+static constexpr size_t angleTableSize = 13;
+
+static constexpr float rawAngleTable[angleTableSize][2] = {
+    {0 ,  0.543435133025 },
+    {5 ,  4.00577747242},
+    {10 ,  7.43929270944},
+    {15 ,  10.7974821673},
+    {20 ,  14.1353404642},
+    {25 ,  17.8730522187},
+    {30 ,  21.1051702216},
+    {35 ,  24.4142841826},
+    {40 ,  27.4900813837},
+    {45 ,  30.3007132009},
+    {50 ,  33.0127021257},
+    {55 ,  35.3792224288},
+    {60 ,  37.1425467344}
+};
+
+float AripsHardware::kinectAngle2Raw(float angle) const {
+
+   size_t idx = 0;
+   for(idx = 0; idx < angleTableSize-2; idx++) {
+       if(angle < rawAngleTable[idx+1][1])
+       break;
+   }
+
+   float alpha = (angle - rawAngleTable[idx][1])/(rawAngleTable[idx+1][1] - rawAngleTable[idx][1]);
+   return 90.0f + rawAngleTable[idx][0] * (1.0f - alpha) + rawAngleTable[idx+1][0] * alpha;
 }
 
 } /* namespace arips */

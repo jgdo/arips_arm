@@ -65,12 +65,12 @@ void loop() {
 	};
 
 	static const float pidParams[ArmConfig::NUM_JOINTS][3] = {
-			{0.5, 0.02, 0.0},
-			{0.5, 0.02, 0.0},
-			{0.5, 0.02, 0.0},
-			{0.5, 0.02, 0.0},
-			{0.5, 0.02, 0.0},
-			{0.5, 0.02, 0.0}
+			{1, 0.02, 0.1},
+			{2, 0.05, 0.05},
+			{5, 0.05, 0.1},
+			{1, 0.05, 0.0},
+			{1, 0.05, 0.0},
+			{1, 0.0, 0.0}
 	};
 
 	for(size_t i = 0; i < ArmConfig::NUM_JOINTS; i++) {
@@ -86,7 +86,7 @@ void loop() {
 	arips::AripsHardware theArips;
 
 	auto handle = SysTickTimer::createTimer(ArmConfig::CONTROL_PERIOD_MS, [&]() {
-	    static char buf[50];
+	    // static char buf[50];
 	    uint32_t start = hw::clock::getMsTick();
 		motionMan.onControlTick();
 

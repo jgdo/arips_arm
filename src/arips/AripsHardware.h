@@ -14,6 +14,8 @@
 
 #include <utl/Timer.h>
 
+#include <rosutil/ParameterServer.h>
+
 namespace arips {
 
 class AripsHardware {
@@ -25,6 +27,8 @@ public:
 
     long long currentDrivenDistLeft = 0, currentDrivenDistRight = 0;
     double currentPosX = 0, currentPosY = 0, currentAngle = 0;
+
+    float currentKinectAngle = 0;
 
     SysTickTimerHandle mCheckOdometryTimer;
     SysTickTimerHandle mRequestOdometryTimer;
@@ -45,6 +49,8 @@ public:
     void checkSendOdometryTF();
 
     void kinectTiltCb(const std_msgs::Float32& msg);
+
+    float kinectAngle2Raw(float angle) const;
 };
 
 } /* namespace arips */

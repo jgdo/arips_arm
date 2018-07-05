@@ -329,6 +329,7 @@ src/robot/RobotArmHardware.cpp.o: ../src/robot/RobotArmHardware.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/SetParam.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/RobotModel.h
@@ -992,6 +993,8 @@ src/robot/RobotArmHardware.cpp.o: ../src/robot/RobotArmHardware.cpp \
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
 

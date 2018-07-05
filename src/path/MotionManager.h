@@ -33,6 +33,8 @@ public:
 		TRAJECTORY, // trajectory (setpoint sequence)
 	};
 	
+	static constexpr int TRAJECTORY_FINISHED_RELEASE_TICKS = 500;
+
 	/**
 	 * 
 	 */
@@ -100,6 +102,8 @@ private:
 	uint32_t mPathStartTimeMs = 0;
 	uint32_t mControlCycleCount = 0;
 	
+	int32_t mRelaseTrajectoryTicks = -1; // control ticks after which to go into BREAK mode once trajectory has finished, invalid if negative
+
 	/**
 	 * In RAW_MOTORS mode: raw motor pwm setpoint values
 	 * In DIRECT_JOINTS mode: joint effort setpoint values
@@ -107,6 +111,8 @@ private:
 	 */
 	robot::JointPowers mRawJointPowers;
 	
+	robot::JointMotionStates mControlSetpoint; /** holds most recent trajectory setpoint */
+
 	void checkAndSetPWM(JointStatesMsg& states, robot::JointPowers& powers);
 };
 

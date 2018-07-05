@@ -2,6 +2,7 @@ src/hw/MD25Motors.cpp.o: ../src/hw/MD25Motors.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/Arduino.h \
  /home/jgdo/tools/sloeber/arduinoPlugin/packages/arduino/hardware/sam/1.6.11/cores/arduino/avr/pgmspace.h \
@@ -144,6 +145,8 @@ src/hw/MD25Motors.cpp.o: ../src/hw/MD25Motors.cpp \
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
 

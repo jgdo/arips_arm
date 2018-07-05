@@ -6,6 +6,7 @@ src/path/RosMotionManager.cpp.o: ../src/path/RosMotionManager.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/control/Controller.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/path/SingleTargetPathProvider.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/vecdef.h \
@@ -363,6 +364,8 @@ src/path/RosMotionManager.cpp.o: ../src/path/RosMotionManager.cpp \
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
 

@@ -14,7 +14,10 @@ using namespace robot::ArmConfig;
 namespace path {
 
 MotionManager::MotionManager(robot::RobotArmController* controller, robot::RobotArmHardware* arm) :
-		mJointController(controller), mArmHardware(arm) {
+		mJointController(controller), mArmHardware(arm){
+    for(auto& v: mControlSetpoint) {
+        v = Vec2f(0,0);
+    }
 }
 
 MotionManager::~MotionManager() {
@@ -74,7 +77,7 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 		jointStates.at(i).velocity = lastJointStates.at(i).motionState[1];
 	}
 	
-	robot::JointMotionStates controlInput, controlSetpoint;
+	robot::JointMotionStates controlInput;
 	
 	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
 		controlInput.at(i) = lastJointStates.at(i).motionState;
@@ -109,10 +112,10 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 		
 	case HOLD: { // motors should hold position
 		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-			controlSetpoint.at(i) = Vec2f::Zero();
+		    mControlSetpoint.at(i) = Vec2f::Zero();
 		}
 		
-		robot::JointPowers outputs = mJointController->computeControl(controlInput, controlSetpoint);
+		robot::JointPowers outputs = mJointController->computeControl(controlInput, mControlSetpoint);
 		
 		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
 			jointStates.at(i).setpoint_pos = lastJointStates.at(i).motionState[0];
@@ -124,27 +127,32 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 		break;
 		
 	case TRAJECTORY: {
-		TrajectoryPathBuffer::PointState ps = mTrajectoryPathBuffer.getNextSetpoint(&controlSetpoint);
+		TrajectoryPathBuffer::PointState ps = mTrajectoryPathBuffer.getNextSetpoint(&mControlSetpoint);
 		if (ps == TrajectoryPathBuffer::VALID) {
 			mControlCycleCount++;
 		} else if (ps == TrajectoryPathBuffer::EMPTY) {
 			// if trajectory buffer is empty, hold position
 			for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-				controlSetpoint.at(i) = Vec2f(lastJointStates.at(i).motionState[0], 0);
+			    mControlSetpoint.at(i) = Vec2f(lastJointStates.at(i).motionState[0], 0);
 			}
 		} else if (ps == TrajectoryPathBuffer::FINISHED) {
-			// if trajectory finished, hold position
+		    mRelaseTrajectoryTicks = TRAJECTORY_FINISHED_RELEASE_TICKS;
+			// if trajectory finished, hold position for TRAJECTORY_FINISHED_RELEASE_TICKS
+
 			for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-				controlSetpoint.at(i) = Vec2f(lastJointStates.at(i).motionState[0], 0);
+			    mRawJointPowers.at(i) = mControlSetpoint.at(i)[0];
+			    // controlSetpoint.at(i) = Vec2f(lastJointStates.at(i).motionState[0], 0);
 			}
-			mCurrentState = BREAK;
+
+		    // keep last mControlSetpoint
+			mCurrentState = DIRECT_CONTROLLER;
 		}
 		
-		robot::JointPowers outputs = mJointController->computeControl(controlInput, controlSetpoint);
+		robot::JointPowers outputs = mJointController->computeControl(controlInput, mControlSetpoint);
 		
 		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-			jointStates.at(i).setpoint_pos = controlSetpoint.at(i)[0];
-			jointStates.at(i).setpoint_vel = controlSetpoint.at(i)[1];
+			jointStates.at(i).setpoint_pos = mControlSetpoint.at(i)[0];
+			jointStates.at(i).setpoint_vel = mControlSetpoint.at(i)[1];
 		}
 		
 		checkAndSetPWM(jointStates, outputs);
@@ -153,15 +161,24 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 		
 	case DIRECT_CONTROLLER:
 	{
+	    if(mRelaseTrajectoryTicks > 0) {
+	        mRelaseTrajectoryTicks--;
+	    } else if(mRelaseTrajectoryTicks == 0) {
+	        mRelaseTrajectoryTicks = -1;
+	        mArmHardware->breakMotors();
+	        mCurrentState = BREAK;
+	        break;
+	    }
+
 		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-			controlSetpoint.at(i) = Vec2f(mRawJointPowers.at(i), 0);
+		    mControlSetpoint.at(i) = Vec2f(mRawJointPowers.at(i), 0);
 		}
 		
-		robot::JointPowers outputs = mJointController->computeControl(controlInput, controlSetpoint);
+		robot::JointPowers outputs = mJointController->computeControl(controlInput, mControlSetpoint);
 		
 		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-			jointStates.at(i).setpoint_pos = controlSetpoint.at(i)[0];
-			jointStates.at(i).setpoint_vel = controlSetpoint.at(i)[1];
+			jointStates.at(i).setpoint_pos = mControlSetpoint.at(i)[0];
+			jointStates.at(i).setpoint_vel = mControlSetpoint.at(i)[1];
 		}
 		checkAndSetPWM(jointStates, outputs);
 	}
@@ -173,9 +190,9 @@ void MotionManager::checkAndSetPWM(JointStatesMsg& states, robot::JointPowers& p
 	mArmHardware->setJointPowers(powers);
 	(void)states;
 	// TODO check error state
-	//for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-	//	states.at(i).pwm = powers.at(i);
-	//}
+	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+		states.at(i).torque = powers.at(i);
+	}
 }
 
 } /* namespace path */

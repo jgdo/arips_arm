@@ -1,6 +1,7 @@
 src/hw/hw.cpp.o: ../src/hw/hw.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/AdafruitV2Motor.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
@@ -150,6 +151,8 @@ src/hw/hw.cpp.o: ../src/hw/hw.cpp \
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/hw.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
 

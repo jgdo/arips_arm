@@ -46,8 +46,8 @@ namespace tf
     public:
       TransformBroadcaster() : publisher_("/tf", &internal_msg) {}
 
-      template<class NH>
-      void init(NH &nh)
+      template<class NodeT>
+      void init(NodeT &nh)
       {
         nh.advertise(publisher_);
       }

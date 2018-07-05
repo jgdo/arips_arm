@@ -53,6 +53,8 @@ inline static uint32_t stateToRosMode(MotionManager::State state) {
 }
 
 void RosMotionManager::onControlTick() {
+    uint32_t start = hw::clock::getMsTick();
+
 	mMotionStateMsg.stamp = ros::nh.now();
 	mMotionStateMsg.mode = stateToRosMode(mMotionManager.getState());
 
@@ -66,6 +68,10 @@ void RosMotionManager::onControlTick() {
 	mMotionStateMsg.trajState.controlCycleCount = mMotionManager.getControlCycleCount();
 	mMotionStateMsg.trajState.numPointsInBuffer = mMotionManager.getTrajectoryBuffer().getCurrentBufferSize();
 	
+
+	uint32_t dt = hw::clock::getMsTick() - start;
+	mMotionStateMsg.controlLoopTime = dt / 1000.0f;
+
 	mMotionStatePub.publish(&mMotionStateMsg);
 }
 
