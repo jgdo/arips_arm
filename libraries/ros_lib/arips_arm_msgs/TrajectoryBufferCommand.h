@@ -65,7 +65,7 @@ namespace arips_arm_msgs
     }
 
     const char * getType(){ return "arips_arm_msgs/TrajectoryBufferCommand"; };
-    const char * getMD5(){ return "1909df88293e4497feff79ee4974e9f5"; };
+    const char * getMD5(){ return "108db3e568ade6f28ec4f67fa542c6c8"; };
 
   };
 

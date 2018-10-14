@@ -19,14 +19,14 @@
 
 namespace robot {
 
-typedef std::array<float, ArmConfig::NUM_JOINTS> JointPowers;
-typedef std::array<JointState, ArmConfig::NUM_JOINTS> JointStates;
+typedef std::array<float, ArmConfig::NUM_ALL_JOINTS> JointPowersAll;
+typedef std::array<JointState, ArmConfig::NUM_ALL_JOINTS> JointStatesAll;
 
 class RobotArmHardware {
 public:
 	RobotArmHardware(const RobotModel& model,
-					std::array<hw::Actuator*, ArmConfig::NUM_JOINTS> const& actuators,
-			 	 	std::array<JointStateObserver*, ArmConfig::NUM_JOINTS> const& observers);
+					std::array<hw::Actuator*, ArmConfig::NUM_ALL_JOINTS> const& actuators,
+			 	 	std::array<JointStateObserver*, ArmConfig::NUM_ALL_JOINTS> const& observers);
 	/**
 	 * Shortcut all motors to create a breaking effect.
 	 */
@@ -44,30 +44,32 @@ public:
 	 * 
 	 * @params powers try to apply given power, set value to actually applied power
 	 */
-	void setJointPowers(JointPowers& powers);
+	void setJointPowers(JointPowersAll& powers);
 	
 	/**
 	 * Apply power to all motors. No joint limits are checked!
 	 */
-	void setRawMotorPowers(const JointPowers& powers);
+	void setRawMotorPowers(const JointPowersAll& powers);
 	
 	/**
 	 * Read the current joint states
+	 *
+	 * @param lastTorque last motor torque values
 	 */
-	void readJointStates();
+	void readJointStates(robot::JointPowersAll const& lastTorque);
 	
 	/**
 	 * Get joint states since last readJointStates() call
 	 */
-	const JointStates& getJointStates();
+	const JointStatesAll& getJointStates();
 	
 private:
 	const RobotModel& mModel;
-	std::array<hw::Actuator*, ArmConfig::NUM_JOINTS> mActuators;
-	std::array<JointStateObserver*, ArmConfig::NUM_JOINTS> mObservers;
-	JointStates mLastJointStates;
+	std::array<hw::Actuator*, ArmConfig::NUM_ALL_JOINTS> mActuators;
+	std::array<JointStateObserver*, ArmConfig::NUM_ALL_JOINTS> mObservers;
+	JointStatesAll mLastJointStates;
 	
-	bool limitJointPower(size_t index, JointPowers::value_type& power);
+	bool limitJointPower(size_t index, JointPowersAll::value_type& power);
 };
 
 } /* namespace robot */

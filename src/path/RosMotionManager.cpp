@@ -11,24 +11,27 @@ using namespace robot::ArmConfig;
 
 namespace path {
 
-static_assert(sizeof(arips_arm_msgs::MotionState::jointStates)/sizeof(arips_arm_msgs::JointState) == NUM_JOINTS,
+static_assert(sizeof(arips_arm_msgs::MotionState::jointStates)/sizeof(arips_arm_msgs::JointState) == NUM_ALL_JOINTS,
         "Declared number of joints is different than in message");
 
-static_assert(sizeof(arips_arm_msgs::RawMotorCommand::raw_motor_power)/sizeof(float) == NUM_JOINTS,
+static_assert(sizeof(arips_arm_msgs::RawMotorCommand::raw_motor_power)/sizeof(float) == NUM_ALL_JOINTS,
         "Declared number of joints is different than in message");
 
-static_assert(sizeof(arips_arm_msgs::TrajectoryPoint::goals)/sizeof(arips_arm_msgs::JointGoal) == NUM_JOINTS,
+static_assert(sizeof(arips_arm_msgs::TrajectoryPoint::goals)/sizeof(arips_arm_msgs::JointGoal) == NUM_ARM_JOINTS,
         "Declared number of joints is different than in message");
 
 RosMotionManager::RosMotionManager(robot::RobotArmController* controller, robot::RobotArmHardware* arm) :
 		mMotionManager(controller, arm), mMotionCmdSub("motion_command", &RosMotionManager::onMotionCommandCb, this), mTrajBuffSub(
 				"traj_buffer_command", &RosMotionManager::onTrajectoryBuffCb, this), mRawMotorSub("raw_motor_command",
-				&RosMotionManager::onRawMotorCommandCb, this), mMotionStatePub("motion_state", &mMotionStateMsg) {
+				&RosMotionManager::onRawMotorCommandCb, this)
+, mGripperGoalSub("gripper_raw_goal", &RosMotionManager::onGripperGoalCb, this)
+, mMotionStatePub("motion_state", &mMotionStateMsg) {
 	
 	ros::nh.advertise(mMotionStatePub);
 	ros::nh.subscribe(mMotionCmdSub);
 	ros::nh.subscribe(mTrajBuffSub);
 	ros::nh.subscribe(mRawMotorSub);
+	ros::nh.subscribe(mGripperGoalSub);
 }
 
 inline static uint32_t stateToRosMode(MotionManager::State state) {
@@ -52,27 +55,37 @@ inline static uint32_t stateToRosMode(MotionManager::State state) {
 	}
 }
 
+void RosMotionManager::onObserveTick() {
+    mMotionManager.onObserveTick();
+}
+
+
 void RosMotionManager::onControlTick() {
     uint32_t start = hw::clock::getMsTick();
 
 	mMotionStateMsg.stamp = ros::nh.now();
-	mMotionStateMsg.mode = stateToRosMode(mMotionManager.getState());
 
 	// TODO: call directly
-	MotionManager::JointStatesMsg jsm;
+	MotionManager::JointStatesMsgAll jsm;
 	// std::copy(std::begin(mMotionStateMsg.jointStates), std::end(mMotionStateMsg.jointStates), std::begin(jsm));
 	mMotionManager.onControlTick(jsm);
 	std::copy(std::begin(jsm), std::end(jsm), std::begin(mMotionStateMsg.jointStates));
 
 	mMotionStateMsg.trajState.bufferCapacity = TrajectoryPathBuffer::TRAJECTORY_BUFFER_CAPACITY;
-	mMotionStateMsg.trajState.controlCycleCount = mMotionManager.getControlCycleCount();
+	mMotionStateMsg.trajState.controlCycleCount = mMotionManager.getTrajectoryBuffer().getLastTrajectoryIndex();
 	mMotionStateMsg.trajState.numPointsInBuffer = mMotionManager.getTrajectoryBuffer().getCurrentBufferSize();
-	
 
 	uint32_t dt = hw::clock::getMsTick() - start;
 	mMotionStateMsg.controlLoopTime = dt / 1000.0f;
 
-	mMotionStatePub.publish(&mMotionStateMsg);
+	mMotionStateMsg.mode = stateToRosMode(mMotionManager.getState());
+
+	static int counter;
+
+	if((++counter & 3) == 0) {
+	    counter = 0;
+	    mMotionStatePub.publish(&mMotionStateMsg);
+	}
 }
 
 void RosMotionManager::onMotionCommandCb(const arips_arm_msgs::MotionCommand& msg) {
@@ -81,7 +94,7 @@ void RosMotionManager::onMotionCommandCb(const arips_arm_msgs::MotionCommand& ms
 	if (msg.command == MotionCommand::CMD_RAW_MOTORS) {
 		mMotionManager.enterRawMode();
 	} else if (msg.command == MotionCommand::CMD_START_TRAJECTORY) {
-		mMotionManager.startFollowingTrajectory();
+		mMotionManager.enterFollowingTrajectory();
 	} else if (msg.command == MotionCommand::CMD_BREAK) {
 		mMotionManager.stop();
 	} else if (msg.command == MotionCommand::CMD_RELEASE) {
@@ -93,19 +106,27 @@ void RosMotionManager::onMotionCommandCb(const arips_arm_msgs::MotionCommand& ms
 
 void RosMotionManager::onTrajectoryBuffCb(const arips_arm_msgs::TrajectoryBufferCommand& msg) {
 	TrajectoryPathBuffer& buf = mMotionManager.getTrajectoryBuffer();
-	if (msg.start_index > mMotionManager.getControlCycleCount()) {
+	/*if (msg.start_index > mMotionManager.getControlCycleCount()) {
 		return; // error: skipped points
-	} else {
+	} else */
+	{
 		if (msg.start_index == 0) {
-			buf.newTrajectory(msg.size);
+		    mMotionManager.resetTrajectory(msg.size);
 		}
 		
-		int skip = mMotionManager.getControlCycleCount() - msg.start_index;
+		int passedIndex = buf.getLastTrajectoryIndex();
+
+		int startInMsg = passedIndex > msg.start_index? passedIndex - msg.start_index : 0;
+		int startInBuf = passedIndex < msg.start_index? msg.start_index - passedIndex : 0;
 
 		// TODO .size()
-		for (size_t i = skip; i < std::min<size_t>(msg.size, sizeof(msg.traj_points)/sizeof(*msg.traj_points)); i++) {
+		size_t msgIndex, bufIndex;
+		for (msgIndex = startInMsg, bufIndex = startInBuf;
+		        msgIndex < std::min<size_t>(msg.size, sizeof(msg.traj_points)/sizeof(*msg.traj_points))
+		        && bufIndex < TrajectoryPathBuffer::TRAJECTORY_BUFFER_CAPACITY-1;
+		            msgIndex++, bufIndex++) {
 			// TODO .at(i)
-			if (!buf.setTrajectoryPoint(i - skip, msg.traj_points[i])) {
+			if (!buf.setTrajectoryPoint(bufIndex, msg.traj_points[msgIndex])) {
 				break; // buffer is full
 			}
 		}
@@ -114,10 +135,13 @@ void RosMotionManager::onTrajectoryBuffCb(const arips_arm_msgs::TrajectoryBuffer
 
 void RosMotionManager::onRawMotorCommandCb(const arips_arm_msgs::RawMotorCommand& msg) {
 	// TODO call directly
-	robot::JointPowers pw;
+	robot::JointPowersAll pw;
 	std::copy(std::begin(msg.raw_motor_power), std::end(msg.raw_motor_power), std::begin(pw));
 	mMotionManager.setRawMotorPowers(pw);
 }
 
-} /* namespace path */
+void RosMotionManager::onGripperGoalCb(const std_msgs::Float32& msg) {
+    mMotionManager.setGripperGoal(msg.data);
+}
 
+} /* namespace path */

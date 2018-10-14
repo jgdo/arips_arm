@@ -343,6 +343,7 @@ src/path/MotionManager.cpp.o: ../src/path/MotionManager.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/ParameterDef.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/SetParam.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Kalman.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/RobotModel.h
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/path/MotionManager.h:
@@ -1032,5 +1033,7 @@ src/path/MotionManager.cpp.o: ../src/path/MotionManager.cpp \
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/SetParam.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Kalman.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/RobotModel.h:

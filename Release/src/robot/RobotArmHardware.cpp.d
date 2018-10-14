@@ -332,6 +332,7 @@ src/robot/RobotArmHardware.cpp.o: ../src/robot/RobotArmHardware.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Servo.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Kalman.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/RobotModel.h
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/RobotArmHardware.h:
@@ -999,5 +1000,7 @@ src/robot/RobotArmHardware.cpp.o: ../src/robot/RobotArmHardware.cpp \
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Kalman.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/RobotModel.h:

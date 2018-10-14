@@ -344,12 +344,14 @@ src/path/RosMotionManager.cpp.o: ../src/path/RosMotionManager.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/ParameterDef.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tiny_reconfigure/SetParam.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Kalman.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/RobotModel.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/MotionCommand.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/MotionState.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/TrajectoryState.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/TrajectoryBufferCommand.h \
- /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/RawMotorCommand.h
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/RawMotorCommand.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Float32.h
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/path/RosMotionManager.h:
 
@@ -1041,6 +1043,8 @@ src/path/RosMotionManager.cpp.o: ../src/path/RosMotionManager.cpp \
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h:
 
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Kalman.h:
+
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/RobotModel.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/MotionCommand.h:
@@ -1052,3 +1056,5 @@ src/path/RosMotionManager.cpp.o: ../src/path/RosMotionManager.cpp \
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/TrajectoryBufferCommand.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/RawMotorCommand.h:
+
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Float32.h:

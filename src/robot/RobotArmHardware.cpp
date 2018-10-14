@@ -6,12 +6,13 @@
  */
 
 #include <robot/RobotArmHardware.h>
+#include <tuple>
 
 namespace robot {
 
 RobotArmHardware::RobotArmHardware(const RobotModel& model,
-		std::array<hw::Actuator*, ArmConfig::NUM_JOINTS> const& actuators,
-		std::array<JointStateObserver*, ArmConfig::NUM_JOINTS> const& observers) :
+		std::array<hw::Actuator*, ArmConfig::NUM_ALL_JOINTS> const& actuators,
+		std::array<JointStateObserver*, ArmConfig::NUM_ALL_JOINTS> const& observers) :
 		mModel(model), mActuators(actuators), mObservers(observers) {
 }
 
@@ -27,7 +28,7 @@ void RobotArmHardware::releaseMotors() {
 	}
 }
 
-bool RobotArmHardware::limitJointPower(size_t i, JointPowers::value_type& power) {
+bool RobotArmHardware::limitJointPower(size_t i, JointPowersAll::value_type& power) {
 	auto& state = mLastJointStates.at(i);
 	auto& limits = mModel.getJointLimits();
 	
@@ -43,8 +44,8 @@ bool RobotArmHardware::limitJointPower(size_t i, JointPowers::value_type& power)
 	}
 }
 
-void RobotArmHardware::setJointPowers(JointPowers& powers) {
-	static_assert(ArmConfig::NUM_JOINTS == 6, "This RobotArmHardware specialized on a 5 DOF + gripper robot");
+void RobotArmHardware::setJointPowers(JointPowersAll& powers) {
+	static_assert(ArmConfig::NUM_ALL_JOINTS == 6, "This RobotArmHardware specialized on a 5 DOF + gripper robot");
 	
 	for (size_t i = 0; i < 3; i++) {
 		if(limitJointPower(i, powers.at(i))) {
@@ -74,19 +75,22 @@ void RobotArmHardware::setJointPowers(JointPowers& powers) {
     }
 }
 
-void RobotArmHardware::readJointStates() {
+void RobotArmHardware::readJointStates(robot::JointPowersAll const& lastTorque) {
 	for (size_t i = 0; i < mObservers.size(); i++) {
-		mLastJointStates.at(i) = mObservers.at(i)->observeJointState();
+		mLastJointStates.at(i) = mObservers.at(i)->observeJointState(lastTorque.at(i));
 	}
 }
 
-void RobotArmHardware::setRawMotorPowers(const JointPowers& powers) {
-	for (size_t i = 0; i < ArmConfig::NUM_JOINTS; i++) {
+void RobotArmHardware::setRawMotorPowers(const JointPowersAll& powers) {
+    static_assert(std::tuple_size<decltype(mActuators)>::value == std::tuple_size<JointPowersAll>::value,
+            "sizes must match.");
+
+	for (size_t i = 0; i < mActuators.size(); i++) {
 		mActuators.at(i)->apply(powers.at(i));
 	}
 }
 
-const JointStates& RobotArmHardware::getJointStates() {
+const JointStatesAll& RobotArmHardware::getJointStates() {
 	return mLastJointStates;
 }
 

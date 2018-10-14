@@ -16,6 +16,7 @@
 #include <arips_arm_msgs/MotionState.h>
 #include <arips_arm_msgs/TrajectoryBufferCommand.h>
 #include <arips_arm_msgs/RawMotorCommand.h>
+#include <std_msgs/Float32.h>
 
 namespace path {
 
@@ -23,6 +24,7 @@ class RosMotionManager {
 public:
 	RosMotionManager(robot::RobotArmController* controller, robot::RobotArmHardware* arm);
 	
+	void onObserveTick();
 	void onControlTick();
 	
 private:
@@ -30,7 +32,8 @@ private:
 	ros::Subscriber<arips_arm_msgs::MotionCommand, RosMotionManager> mMotionCmdSub;
 	ros::Subscriber<arips_arm_msgs::TrajectoryBufferCommand, RosMotionManager> mTrajBuffSub;
 	ros::Subscriber<arips_arm_msgs::RawMotorCommand, RosMotionManager> mRawMotorSub;
-	
+	ros::Subscriber<std_msgs::Float32, RosMotionManager> mGripperGoalSub;
+
 	arips_arm_msgs::MotionState mMotionStateMsg;
 	ros::Publisher mMotionStatePub;
 	
@@ -39,6 +42,8 @@ private:
 	void onTrajectoryBuffCb(const arips_arm_msgs::TrajectoryBufferCommand& msg);
 	
 	void onRawMotorCommandCb(const arips_arm_msgs::RawMotorCommand& msg);
+
+	void onGripperGoalCb(const std_msgs::Float32& msg);
 };
 
 } /* namespace path */

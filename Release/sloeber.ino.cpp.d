@@ -344,6 +344,7 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/MD25Motors.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointState.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/ArmConfig.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Kalman.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/RobotArmHardware.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/JointStateObserver.h \
@@ -361,6 +362,7 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/TrajectoryState.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/TrajectoryBufferCommand.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/RawMotorCommand.h \
+ /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Float32.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/arips/AripsHardware.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tf/transform_broadcaster.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tf/tfMessage.h \
@@ -375,7 +377,6 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Point.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/TwistWithCovariance.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Twist.h \
- /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Float32.h \
  /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Timer.h \
  ../arips_arm_firmware.ino
 
@@ -1069,6 +1070,8 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/ArmConfig.h:
 
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Kalman.h:
+
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/robot/RobotArmHardware.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/hw/Actuator.hpp:
@@ -1103,6 +1106,8 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/arips_arm_msgs/RawMotorCommand.h:
 
+/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Float32.h:
+
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/arips/AripsHardware.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/tf/transform_broadcaster.h:
@@ -1130,8 +1135,6 @@ sloeber.ino.cpp.o: ../sloeber.ino.cpp \
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/TwistWithCovariance.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/geometry_msgs/Twist.h:
-
-/home/jgdo/dev/sloeber-workspace/arips_arm_firmware/libraries/ros_lib/std_msgs/Float32.h:
 
 /home/jgdo/dev/sloeber-workspace/arips_arm_firmware/src/utl/Timer.h:
 

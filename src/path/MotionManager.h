@@ -21,7 +21,7 @@ namespace path {
 
 class MotionManager {
 public:
-	typedef std::array<arips_arm_msgs::JointState, robot::ArmConfig::NUM_JOINTS> JointStatesMsg;
+	typedef std::array<arips_arm_msgs::JointState, robot::ArmConfig::NUM_ALL_JOINTS> JointStatesMsgAll;
 	
 	enum State {
 		IDLE = 0, // motors are turned off
@@ -42,18 +42,28 @@ public:
 	~MotionManager();
 	
 	/**
+	 * Called periodically to observe joint states
+	 */
+	void onObserveTick();
+
+	/**
 	 * Called periodically on every control tick
 	 * 
 	 * @param jointStates will be filled with current joint states
 	 */
-	void onControlTick(JointStatesMsg& jointStates);
+    void onControlTick(JointStatesMsgAll& jointStates);
 	
 	
 	/**
 	 * Start following trajectory in trajectory buffer
 	 */
-	void startFollowingTrajectory();
+	void enterFollowingTrajectory();
 	
+	/**
+	 * Reset trajectory buffer and time. Does not enter TAJECTORY mode automatically
+	 */
+	void resetTrajectory(size_t trajSize);
+
 	/**
 	 * Cancel any movement goals and stop
 	 */
@@ -84,12 +94,13 @@ public:
 		return mCurrentState;
 	}
 	
-	inline uint32_t getControlCycleCount() const {
-		return mControlCycleCount;
-	}
+	void setRawMotorPowers(const robot::JointPowersAll& powers);
 	
-	void setRawMotorPowers(const robot::JointPowers& powers);
-	
+	/**
+	 * Set gripper target position. If not in TRAJECTORY or DIRECT_CONTROLLER state, set state to DIRECT_CONTROLLER
+	 */
+	void setGripperGoal(float goal);
+
 private:
 	State mCurrentState = IDLE;
 	
@@ -99,8 +110,7 @@ private:
 	// SingleTargetPathProvider mSingleTargetProvider;
 	TrajectoryPathBuffer mTrajectoryPathBuffer;
 	
-	uint32_t mPathStartTimeMs = 0;
-	uint32_t mControlCycleCount = 0;
+	uint32_t mTrajectoryStartTime_ms = 0; // time when trajectory started
 	
 	int32_t mRelaseTrajectoryTicks = -1; // control ticks after which to go into BREAK mode once trajectory has finished, invalid if negative
 
@@ -108,12 +118,13 @@ private:
 	 * In RAW_MOTORS mode: raw motor pwm setpoint values
 	 * In DIRECT_JOINTS mode: joint effort setpoint values
 	 * In DIRECT_CONTROLLER mode: joint angle setpoint values as controller input
+	 * In TRAJECTORY mode: .at(GRIPPER_INDEX) is gripper setpoint
 	 */
-	robot::JointPowers mRawJointPowers;
+	robot::JointPowersAll mRawJointPowers;
 	
-	robot::JointMotionStates mControlSetpoint; /** holds most recent trajectory setpoint */
+	robot::JointMotionStatesAll mControlSetpoint; /** holds most recent trajectory setpoint */
 
-	void checkAndSetPWM(JointStatesMsg& states, robot::JointPowers& powers);
+	void checkAndSetPWM(JointStatesMsgAll& states, robot::JointPowersAll& powers);
 };
 
 } /* namespace path */

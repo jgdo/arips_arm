@@ -17,12 +17,18 @@
 namespace robot {
 
 namespace ArmConfig {
-	static constexpr uint32_t NUM_JOINTS = 6;
-	static constexpr uint32_t CONTROL_PERIOD_MS = 10;
+    static constexpr uint32_t NUM_ARM_JOINTS = 5;
+	static constexpr uint32_t NUM_ALL_JOINTS = NUM_ARM_JOINTS+1;
+	static constexpr uint32_t GRIPPER_INDEX = NUM_ARM_JOINTS;
+
+	static constexpr uint32_t CONTROL_PERIOD_MS = 8;
 	static constexpr float CONTROL_PERIOD_S = CONTROL_PERIOD_MS * 0.001F;
+
+	static constexpr uint32_t JOINT_OBSERVE_PERIOD_MS = 4;
+	static constexpr float JOINT_OBSERVE_PERIOS_S = JOINT_OBSERVE_PERIOD_MS * 0.001F;
 }
 
-typedef ctrl::GroupController<Vec2f, ArmConfig::NUM_JOINTS> RobotArmController;
+typedef ctrl::GroupController<Vec2f, ArmConfig::NUM_ALL_JOINTS> RobotArmController;
 
 }
 

@@ -24,22 +24,35 @@ MotionManager::~MotionManager() {
 	
 }
 
-void MotionManager::startFollowingTrajectory() {
-	mCurrentState = TRAJECTORY;
-	mControlCycleCount = 0;
-	mPathStartTimeMs = hw::clock::getMsTick();
+void MotionManager::resetTrajectory(size_t trajSize) {
+    mTrajectoryStartTime_ms = hw::clock::getMsTick();
+    mTrajectoryPathBuffer.newTrajectory(trajSize);
+}
+
+void MotionManager::enterFollowingTrajectory() {
+    if(mCurrentState != TRAJECTORY && mCurrentState != DIRECT_CONTROLLER) {
+        mRawJointPowers.at(GRIPPER_INDEX) = mArmHardware->getJointStates().at(GRIPPER_INDEX).motionState[0];
+    }
+
+    if(mCurrentState != TRAJECTORY) {
+        mCurrentState = TRAJECTORY;
+
+        mTrajectoryStartTime_ms = hw::clock::getMsTick();
+
+        for (size_t i = 0; i < mRawJointPowers.size(); i++) {
+            mControlSetpoint.at(i) = Vec2f(mArmHardware->getJointStates().at(i).motionState[0], 0);
+        }
+    }
 }
 
 void MotionManager::stop() {
 	mCurrentState = BREAK;
-	mControlCycleCount = 0;
 	mArmHardware->breakMotors();
 	mJointController->reset();
 }
 
 void MotionManager::release() {
 	mCurrentState = IDLE;
-	mControlCycleCount = 0;
 	mArmHardware->releaseMotors();
 	mJointController->reset();
 }
@@ -57,7 +70,7 @@ void path::MotionManager::enterDirectJointsMode() {
 	mArmHardware->setJointPowers(mRawJointPowers);
 }
 
-void path::MotionManager::setRawMotorPowers(const robot::JointPowers& powers) {
+void MotionManager::setRawMotorPowers(const robot::JointPowersAll& powers) {
 	if (mCurrentState == RAW_MOTORS) {
 		mRawJointPowers = powers;
 		mArmHardware->setRawMotorPowers(mRawJointPowers);
@@ -66,20 +79,46 @@ void path::MotionManager::setRawMotorPowers(const robot::JointPowers& powers) {
 	}
 }
 
-void MotionManager::onControlTick(JointStatesMsg& jointStates) {
-	mArmHardware->readJointStates();
-	const robot::JointStates& lastJointStates = mArmHardware->getJointStates();
-	
+void MotionManager::setGripperGoal(float goal) {
+    if(mCurrentState != TRAJECTORY && mCurrentState != DIRECT_CONTROLLER) {
+        enterDirectControllerMode();
+    }
+
+    mRawJointPowers.at(GRIPPER_INDEX) = goal;
+}
+
+void MotionManager::enterDirectControllerMode() {
+    mCurrentState = DIRECT_CONTROLLER;
+
+    for (size_t i = 0; i < mRawJointPowers.size(); i++) {
+        mRawJointPowers.at(i) = mArmHardware->getJointStates().at(i).motionState[0];
+    }
+
+    mArmHardware->breakMotors();
+}
+
+void MotionManager::onObserveTick() {
+    robot::JointPowersAll lastTorque;
+   for (size_t i = 0; i < lastTorque.size(); i++) {
+       lastTorque.at(i) = 0;
+   }
+   mArmHardware->readJointStates(lastTorque);
+}
+
+void MotionManager::onControlTick(JointStatesMsgAll& jointStates) {
+	const robot::JointStatesAll& lastJointStates = mArmHardware->getJointStates();
+
 	// float dtStart = (hw::clock::getTimeMs() - mPathStartTimeMs) * 0.001F;
 	
-	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+	for (size_t i = 0; i < jointStates.size(); i++) {
 		jointStates.at(i).position = lastJointStates.at(i).motionState[0];
 		jointStates.at(i).velocity = lastJointStates.at(i).motionState[1];
 	}
 	
-	robot::JointMotionStates controlInput;
+	robot::JointMotionStatesAll controlInput;
+	static_assert(jointStates.size() == controlInput.size(), "Must have equal size.");
 	
-	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+	for (size_t i = 0; i < controlInput.size(); i++) {
 		controlInput.at(i) = lastJointStates.at(i).motionState;
 	}
 	
@@ -93,7 +132,7 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 		break;
 		
 	case RAW_MOTORS:
-		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+		for (size_t i = 0; i < jointStates.size(); i++) {
 			jointStates.at(i).torque = mRawJointPowers.at(i);
 			jointStates.at(i).setpoint_pos = lastJointStates.at(i).motionState[0];
 			jointStates.at(i).setpoint_vel = lastJointStates.at(i).motionState[1];
@@ -103,7 +142,7 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 	case DIRECT_JOINTS:
 			// set powers without checking since raw mode
 			mArmHardware->setJointPowers(mRawJointPowers);
-			for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+			for (size_t i = 0; i < jointStates.size(); i++) {
 				jointStates.at(i).torque = mRawJointPowers.at(i);
 				jointStates.at(i).setpoint_pos = lastJointStates.at(i).motionState[0];
 				jointStates.at(i).setpoint_vel = lastJointStates.at(i).motionState[1];
@@ -111,13 +150,13 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 			break;
 		
 	case HOLD: { // motors should hold position
-		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+		for (size_t i = 0; i < jointStates.size(); i++) {
 		    mControlSetpoint.at(i) = Vec2f::Zero();
 		}
 		
-		robot::JointPowers outputs = mJointController->computeControl(controlInput, mControlSetpoint);
+		robot::JointPowersAll outputs = mJointController->computeControl(controlInput, mControlSetpoint);
 		
-		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+		for (size_t i = 0; i < jointStates.size(); i++) {
 			jointStates.at(i).setpoint_pos = lastJointStates.at(i).motionState[0];
 			jointStates.at(i).setpoint_vel = lastJointStates.at(i).motionState[1];
 		}
@@ -127,19 +166,22 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 		break;
 		
 	case TRAJECTORY: {
-		TrajectoryPathBuffer::PointState ps = mTrajectoryPathBuffer.getNextSetpoint(&mControlSetpoint);
+	    mControlSetpoint.at(GRIPPER_INDEX) = Vec2f(mRawJointPowers.at(GRIPPER_INDEX), 0);
+	    robot::JointMotionStatesArm armSetpoint;
+		TrajectoryPathBuffer::PointState ps = mTrajectoryPathBuffer.getNextSetpoint(&armSetpoint, hw::clock::getMsTick() - mTrajectoryStartTime_ms);
 		if (ps == TrajectoryPathBuffer::VALID) {
-			mControlCycleCount++;
+		    std::copy(armSetpoint.begin(), armSetpoint.end(), mControlSetpoint.begin());
 		} else if (ps == TrajectoryPathBuffer::EMPTY) {
-			// if trajectory buffer is empty, hold position
-			for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-			    mControlSetpoint.at(i) = Vec2f(lastJointStates.at(i).motionState[0], 0);
-			}
+			// if trajectory buffer is empty, keep previous mControlSetpoint
+			//for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+			//    mControlSetpoint.at(i) = Vec2f(lastJointStates.at(i).motionState[0], 0);
+			// }
 		} else if (ps == TrajectoryPathBuffer::FINISHED) {
+		    std::copy(armSetpoint.begin(), armSetpoint.end(), mControlSetpoint.begin());
 		    mRelaseTrajectoryTicks = TRAJECTORY_FINISHED_RELEASE_TICKS;
 			// if trajectory finished, hold position for TRAJECTORY_FINISHED_RELEASE_TICKS
 
-			for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+			for (size_t i = 0; i < mRawJointPowers.size(); i++) {
 			    mRawJointPowers.at(i) = mControlSetpoint.at(i)[0];
 			    // controlSetpoint.at(i) = Vec2f(lastJointStates.at(i).motionState[0], 0);
 			}
@@ -148,9 +190,9 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 			mCurrentState = DIRECT_CONTROLLER;
 		}
 		
-		robot::JointPowers outputs = mJointController->computeControl(controlInput, mControlSetpoint);
+		robot::JointPowersAll outputs = mJointController->computeControl(controlInput, mControlSetpoint);
 		
-		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+		for (size_t i = 0; i < jointStates.size(); i++) {
 			jointStates.at(i).setpoint_pos = mControlSetpoint.at(i)[0];
 			jointStates.at(i).setpoint_vel = mControlSetpoint.at(i)[1];
 		}
@@ -161,6 +203,7 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 		
 	case DIRECT_CONTROLLER:
 	{
+	    /*
 	    if(mRelaseTrajectoryTicks > 0) {
 	        mRelaseTrajectoryTicks--;
 	    } else if(mRelaseTrajectoryTicks == 0) {
@@ -168,15 +211,15 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 	        mArmHardware->breakMotors();
 	        mCurrentState = BREAK;
 	        break;
-	    }
+	    } */
 
-		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+		for (size_t i = 0; i < mControlSetpoint.size(); i++) {
 		    mControlSetpoint.at(i) = Vec2f(mRawJointPowers.at(i), 0);
 		}
 		
-		robot::JointPowers outputs = mJointController->computeControl(controlInput, mControlSetpoint);
+		robot::JointPowersAll outputs = mJointController->computeControl(controlInput, mControlSetpoint);
 		
-		for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+		for (size_t i = 0; i < jointStates.size(); i++) {
 			jointStates.at(i).setpoint_pos = mControlSetpoint.at(i)[0];
 			jointStates.at(i).setpoint_vel = mControlSetpoint.at(i)[1];
 		}
@@ -186,23 +229,14 @@ void MotionManager::onControlTick(JointStatesMsg& jointStates) {
 	}
 }
 
-void MotionManager::checkAndSetPWM(JointStatesMsg& states, robot::JointPowers& powers) {
+void MotionManager::checkAndSetPWM(JointStatesMsgAll& states, robot::JointPowersAll& powers) {
 	mArmHardware->setJointPowers(powers);
 	(void)states;
 	// TODO check error state
-	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
+	for (size_t i = 0; i < states.size(); i++) {
 		states.at(i).torque = powers.at(i);
 	}
 }
 
 } /* namespace path */
 
-void path::MotionManager::enterDirectControllerMode() {
-	mCurrentState = DIRECT_CONTROLLER;
-	
-	for (size_t i = 0; i < robot::ArmConfig::NUM_JOINTS; i++) {
-		mRawJointPowers.at(i) = mArmHardware->getJointStates().at(i).motionState[0];
-	}
-	
-	mArmHardware->breakMotors();
-}

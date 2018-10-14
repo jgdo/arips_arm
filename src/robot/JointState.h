@@ -19,7 +19,8 @@ struct JointState {
 	// float rawPosition; /**< raw position value, usually from corresponding adc, unit undefined */
 };
 
-typedef std::array<Vec2f, ArmConfig::NUM_JOINTS> JointMotionStates;
+typedef std::array<Vec2f, ArmConfig::NUM_ARM_JOINTS> JointMotionStatesArm;
+typedef std::array<Vec2f, ArmConfig::NUM_ALL_JOINTS> JointMotionStatesAll;
 
 } /* namespace robot */
 

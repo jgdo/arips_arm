@@ -38,6 +38,7 @@ AripsHardware::AripsHardware() :
         this->checkSendOdometryTF();
     });
 
+
     mRequestOdometryTimer = SysTickTimer::createTimer(20, [&]() {
         this->requestOdometryTF();
     });

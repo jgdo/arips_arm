@@ -17,7 +17,7 @@ struct JointLimit {
 	float minAngle, maxAngle; // radians
 };
 
-typedef std::array<JointLimit, ArmConfig::NUM_JOINTS> JointLimits;
+typedef std::array<JointLimit, ArmConfig::NUM_ARM_JOINTS> JointLimits;
 
 class RobotModel {
 public:
